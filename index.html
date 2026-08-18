@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bikram Sambat Calendar (iOS Style)</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            iosgray: {
+              400: '#8e8e93',
+              600: '#525252',
+              800: '#1c1c1e',
+              900: '#121214'
+            },
+            iosred: {
+              500: '#ff3b30',
+              600: '#e5332c'
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+  <style>
+    ::-webkit-scrollbar {
+      width: 0;
+    }
+
+    .month-card-node,
+    .year-card-node {
+      will-change: transform;
+      contain: layout style paint;
+    }
+
+    .glass-modal {
+      background: rgba(30, 30, 32, 0.75);
+      backdrop-filter: blur(25px) saturate(190%);
+      -webkit-backdrop-filter: blur(25px) saturate(190%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+  </style>
+</head>
+
+<body class="bg-black text-white font-sans antialiased h-screen w-screen overflow-hidden flex flex-col justify-center items-center select-none">
+
+  <div class="w-full max-w-md h-full sm:h-[92vh] flex flex-col bg-black overflow-hidden relative">
+
+    <header class="z-30 bg-black px-4 py-2 flex items-center justify-between min-h-[44px]">
+      <div id="btn-back" class="flex items-center gap-1 text-iosred-500 font-medium text-lg cursor-pointer transition-opacity duration-150">
+        <span>&lsaquo; 2083</span>
+      </div>
+
+      <div class="flex items-center gap-4 text-white text-lg">
+        <svg class="w-5 h-5 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+
+        <svg class="w-5 h-5 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+      </div>
+    </header>
+
+    <div id="weekday-header" class="grid grid-cols-7 text-center bg-black py-1.5 px-4 text-xs font-medium text-iosgray-600 z-20 border-b border-iosgray-800">
+      <div>S</div>
+      <div>M</div>
+      <div>T</div>
+      <div>W</div>
+      <div>T</div>
+      <div>F</div>
+      <div>S</div>
+    </div>
+
+    <div id="scroll-viewport" class="flex-1 overflow-y-auto relative w-full">
+      <div id="virtual-track" class="relative w-full"></div>
+    </div>
+
+    <div id="year-scroll-viewport" class="flex-1 overflow-y-auto relative w-full hidden">
+      <div id="year-virtual-track" class="relative w-full"></div>
+    </div>
+
+    <footer class="z-30 bg-black border-t border-iosgray-800 px-4 py-3 flex items-center justify-start">
+      <button id="btn-today" class="text-iosred-500 font-medium text-lg cursor-pointer">
+        Today
+      </button>
+    </footer>
+
+    <div id="event-modal-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-200 flex items-center justify-center p-4">
+      <div id="event-modal" class="glass-modal w-full max-w-sm rounded-3xl p-5 shadow-2xl transform scale-95 transition-all duration-200 flex flex-col gap-4">
+        <div class="flex items-start justify-between">
+          <div>
+            <h3 id="modal-bs-date" class="text-2xl font-bold text-white tracking-tight"></h3>
+            <p id="modal-ad-date" class="text-sm font-medium text-iosgray-400 mt-0.5"></p>
+          </div>
+          <button id="modal-close" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 flex items-center justify-center text-iosgray-400 hover:text-white transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="border-t border-white/10"></div>
+
+        <div id="modal-events-list" class="flex flex-col gap-2.5 max-h-60 overflow-y-auto pr-1"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="miti.js"></script>
+  <script src="event_2083.js"></script>
+
+  <script>
+    window.BSEvents = window.BSEvents || {};
+
+    const CalendarDataStore = {
+      ANCHOR: {
+        bsYear: 2056,
+        bsMonthIndex: 8,
+        bsDay: 17,
+        adDate: new Date(Date.UTC(2000, 0, 1))
+      },
+
+      MONTH_NAMES_BS: [
+        "Baishakh",
+        "Jestha",
+        "Ashadh",
+        "Shrawan",
+        "Bhadra",
+        "Ashwin",
+        "Kartik",
+        "Mangsir",
+        "Poush",
+        "Magh",
+        "Falgun",
+        "Chaitra"
+      ],
+
+      AD_MONTHS: [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+      ],
+
+      AD_DAYS: [
+        "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
+      ],
+
+      getMitiData() {
+        if (typeof miti !== 'undefined') return miti;
+        if (typeof window !== 'undefined' && window.miti) return window.miti;
+        return {};
+      }
+    };
+
+    class EventProvider {
+      getDayMetaData(adDate) {
+        const isSaturday = adDate.getUTCDay() === 6;
+        return {
+          isHoliday: isSaturday
+        };
+      }
+
+      getEvents(year, monthIndex, day) {
+        const m = String(monthIndex + 1).padStart(2, '0');
+        const d = String(day).padStart(2, '0');
+        const key = `${year}-${m}-${d}`;
+        return window.BSEvents[key] || [];
+      }
+    }
+
+    class DateEngine {
+      constructor() {
+        this.miti = CalendarDataStore.getMitiData();
+        this.startYear = 1992;
+        this.endYear = 2100;
+        this.monthStartOffsets = [];
+        this.monthMeta = [];
+
+        this._initializeOffsets();
+      }
+
+      _initializeOffsets() {
+        const { ANCHOR } = CalendarDataStore;
+        const anchorIndex = (ANCHOR.bsYear - this.startYear) * 12 + ANCHOR.bsMonthIndex;
+        const totalMonths = (this.endYear - this.startYear + 1) * 12;
+
+        this.monthStartOffsets = new Array(totalMonths);
+        this.monthMeta = new Array(totalMonths);
+        this.monthStartOffsets[anchorIndex] = -(ANCHOR.bsDay - 1);
+
+        for (let i = anchorIndex; i < totalMonths - 1; i++) {
+          const year = this.startYear + Math.floor(i / 12);
+          const month = i % 12;
+          this.monthStartOffsets[i + 1] = this.monthStartOffsets[i] + (this.miti[year] ? this.miti[year][month] : 30);
+        }
+
+        for (let i = anchorIndex - 1; i >= 0; i--) {
+          const year = this.startYear + Math.floor(i / 12);
+          const month = i % 12;
+          this.monthStartOffsets[i] = this.monthStartOffsets[i + 1] - (this.miti[year] ? this.miti[year][month] : 30);
+        }
+
+        for (let i = 0; i < totalMonths; i++) {
+          const year = this.startYear + Math.floor(i / 12);
+          const monthIndex = i % 12;
+          const totalDays = this.miti[year] ? this.miti[year][monthIndex] : 30;
+          const offset = this.monthStartOffsets[i];
+
+          const startDayOfWeek = ((6 + (offset % 7)) % 7 + 7) % 7;
+          const startAdDate = new Date(ANCHOR.adDate.getTime() + offset * 86400000);
+
+          this.monthMeta[i] = {
+            year,
+            monthIndex,
+            totalDays,
+            startDayOfWeek,
+            numRows: Math.ceil((startDayOfWeek + totalDays) / 7),
+            startAdDate
+          };
+        }
+      }
+
+      adToBs(adDate) {
+        const utcAd = Date.UTC(adDate.getFullYear(), adDate.getMonth(), adDate.getDate());
+        const diffDays = Math.floor((utcAd - CalendarDataStore.ANCHOR.adDate.getTime()) / 86400000);
+
+        let low = 0;
+        let high = this.monthStartOffsets.length - 1;
+        let monthIndex = 0;
+
+        while (low <= high) {
+          const mid = (low + high) >> 1;
+          if (this.monthStartOffsets[mid] <= diffDays) {
+            monthIndex = mid;
+            low = mid + 1;
+          } else {
+            high = mid - 1;
+          }
+        }
+
+        const meta = this.monthMeta[monthIndex];
+
+        return {
+          globalMonthIndex: monthIndex,
+          bsYear: meta.year,
+          bsMonthIndex: meta.monthIndex,
+          bsDay: diffDays - this.monthStartOffsets[monthIndex] + 1
+        };
+      }
+    }
+
+    class VirtualScrollEngine {
+      constructor($viewport, $track, dateEngine, eventProvider, onHeaderUpdate, onDaySelect, initialMonthIndex) {
+        this.$viewport = $viewport;
+        this.$track = $track;
+        this.dateEngine = dateEngine;
+        this.eventProvider = eventProvider;
+        this.onHeaderUpdate = onHeaderUpdate;
+        this.onDaySelect = onDaySelect;
+
+        this.POOL_SIZE = 6;
+        this.MONTH_HEADER_HEIGHT = 44;
+        this.MONTH_HEADER_PADDING_Y = 16;
+        this.CELL_HEIGHT = 44;
+        this.MONTH_MARGIN_TOP = 20;
+
+        this.monthPositions = [];
+        this.poolNodes = [];
+        this.isTicking = false;
+
+        this._calculateLayoutPositions();
+        this._createDOMPool();
+        this._bindDayClick();
+
+        if (initialMonthIndex !== undefined) {
+          this.$viewport[0].scrollTop = this.monthPositions[initialMonthIndex]?.top || 0;
+        }
+
+        this._bindScrollEvent();
+        this.render();
+      }
+
+      _calculateLayoutPositions() {
+        let currentY = this.MONTH_MARGIN_TOP;
+        const { monthMeta } = this.dateEngine;
+        this.monthPositions = new Array(monthMeta.length);
+
+        for (let i = 0; i < monthMeta.length; i++) {
+          const gridHeight = monthMeta[i].numRows * this.CELL_HEIGHT;
+          const height = this.MONTH_HEADER_HEIGHT + this.MONTH_HEADER_PADDING_Y * 2 + gridHeight;
+
+          this.monthPositions[i] = {
+            top: currentY,
+            height,
+            bottom: currentY + height
+          };
+
+          currentY += height + this.MONTH_MARGIN_TOP;
+        }
+
+        this.$track.css('height', `${currentY}px`);
+      }
+
+      _createDOMPool() {
+        this.$track.empty();
+        this.poolNodes = [];
+
+        for (let i = 0; i < this.POOL_SIZE; i++) {
+          const $card = $(`
+            <div class="month-card-node absolute left-0 right-0 mx-auto w-full max-w-full bg-black overflow-hidden px-4">
+              <div class="month-card-header flex items-center justify-start py-4 h-[44px]">
+                <span class="bs-title font-medium text-[28px] text-white"></span>
+              </div>
+              <div class="days-grid grid grid-cols-7 gap-0"></div>
+            </div>
+          `);
+
+          this.$track.append($card);
+          this.poolNodes.push({
+            $el: $card,
+            assignedGlobalIndex: -1
+          });
+        }
+      }
+
+      _bindDayClick() {
+        this.$track.on('click', '.day-cell', (e) => {
+          const $target = $(e.currentTarget);
+          const monthIndex = parseInt($target.data('month-index'), 10);
+          const day = parseInt($target.data('day'), 10);
+          if (!isNaN(monthIndex) && !isNaN(day) && this.onDaySelect) {
+            this.onDaySelect(monthIndex, day);
+          }
+        });
+      }
+
+      _bindScrollEvent() {
+        this.$viewport.on('scroll', () => {
+          if (this.isTicking) return;
+          this.isTicking = true;
+          requestAnimationFrame(() => {
+            this.render();
+            this.isTicking = false;
+          });
+        });
+      }
+
+      render() {
+        const scrollTop = this.$viewport.scrollTop();
+        let low = 0;
+        let high = this.monthPositions.length - 1;
+        let topVisibleIndex = 0;
+
+        while (low <= high) {
+          const mid = (low + high) >> 1;
+          if (this.monthPositions[mid].bottom >= scrollTop) {
+            topVisibleIndex = mid;
+            high = mid - 1;
+          } else {
+            low = mid + 1;
+          }
+        }
+
+        const startIndex = Math.max(0, topVisibleIndex - 1);
+        const endIndex = Math.min(this.monthPositions.length - 1, startIndex + this.POOL_SIZE - 1);
+
+        this.onHeaderUpdate(this.dateEngine.monthMeta[topVisibleIndex]);
+
+        for (let i = startIndex; i <= endIndex; i++) {
+          const node = this.poolNodes[i % this.POOL_SIZE];
+
+          if (node.assignedGlobalIndex !== i) {
+            this._populateMonthCard(node.$el, i);
+            node.assignedGlobalIndex = i;
+          }
+
+          node.$el.css('transform', `translate3d(0, ${this.monthPositions[i].top}px, 0)`);
+        }
+      }
+
+      _populateMonthCard($card, globalMonthIndex) {
+        const meta = this.dateEngine.monthMeta[globalMonthIndex];
+        const monthName = CalendarDataStore.MONTH_NAMES_BS[meta.monthIndex];
+
+        $card.find('.bs-title').text(monthName);
+
+        const $grid = $card.find('.days-grid');
+        $grid.empty();
+
+        for (let i = 0; i < meta.startDayOfWeek; i++) {
+          $grid.append('<div class="h-11"></div>');
+        }
+
+        const today = this.dateEngine.adToBs(new Date());
+
+        for (let day = 1; day <= meta.totalDays; day++) {
+          const currentAdDate = new Date(meta.startAdDate.getTime() + (day - 1) * 86400000);
+          const { isHoliday } = this.eventProvider.getDayMetaData(currentAdDate);
+          const events = this.eventProvider.getEvents(meta.year, meta.monthIndex, day);
+          const hasEvents = events.length > 0;
+
+          const isToday =
+            meta.year === today.bsYear &&
+            meta.monthIndex === today.bsMonthIndex &&
+            day === today.bsDay;
+
+          let numberClass = 'text-white';
+          if (isToday) {
+            numberClass = 'text-white font-medium';
+          } else if (isHoliday) {
+            numberClass = 'text-iosred-600 font-medium';
+          }
+
+          const circle = isToday
+            ? '<div class="absolute inset-0 m-auto aspect-square h-[30px] rounded-full bg-iosred-500 z-0"></div>'
+            : '';
+
+          const eventDot = hasEvents
+            ? `<div class="absolute bottom-1 w-1 h-1 rounded-full ${isToday ? 'bg-white' : 'bg-iosred-500'}"></div>`
+            : '';
+
+          $grid.append(`
+            <div class="day-cell relative h-11 flex flex-col items-center justify-center select-none cursor-pointer rounded-full active:bg-iosgray-800/40" data-month-index="${globalMonthIndex}" data-day="${day}">
+              ${circle}
+              <span class="text-[17px] z-10 leading-none ${numberClass}">${day}</span>
+              ${eventDot}
+            </div>
+          `);
+        }
+      }
+
+      scrollToMonth(globalMonthIndex) {
+        const position = this.monthPositions[globalMonthIndex];
+        if (!position) return;
+        this.$viewport[0].scrollTop = position.top;
+        this.render();
+      }
+    }
+
+    class YearVirtualScrollEngine {
+      constructor($viewport, $track, dateEngine, eventProvider, onSelectMonth) {
+        this.$viewport = $viewport;
+        this.$track = $track;
+        this.dateEngine = dateEngine;
+        this.eventProvider = eventProvider;
+        this.onSelectMonth = onSelectMonth;
+
+        this.startYear = dateEngine.startYear;
+        this.endYear = dateEngine.endYear;
+        this.totalYears = this.endYear - this.startYear + 1;
+
+        this.POOL_SIZE = 6;
+        this.YEAR_HEIGHT = 580;
+        this.YEAR_MARGIN = 24;
+
+        this.yearPositions = [];
+        this.poolNodes = [];
+        this.isTicking = false;
+
+        this._calculateLayoutPositions();
+        this._createDOMPool();
+        this._bindScrollEvent();
+        this._bindClickEvent();
+      }
+
+      _calculateLayoutPositions() {
+        let currentY = 16;
+        this.yearPositions = new Array(this.totalYears);
+
+        for (let i = 0; i < this.totalYears; i++) {
+          this.yearPositions[i] = {
+            top: currentY,
+            height: this.YEAR_HEIGHT,
+            bottom: currentY + this.YEAR_HEIGHT
+          };
+          currentY += this.YEAR_HEIGHT + this.YEAR_MARGIN;
+        }
+
+        this.$track.css('height', `${currentY}px`);
+      }
+
+      _createDOMPool() {
+        this.$track.empty();
+        this.poolNodes = [];
+
+        for (let i = 0; i < this.POOL_SIZE; i++) {
+          const $card = $(`
+            <div class="year-card-node absolute left-0 right-0 mx-auto w-full max-w-full bg-black px-4 pt-2 pb-4 h-[580px] overflow-hidden">
+              <div class="year-card-header flex items-center justify-start pb-2 border-b border-iosgray-800 mb-3 h-[44px]">
+                <span class="year-title font-bold text-2xl text-iosred-500"></span>
+              </div>
+              <div class="months-grid grid grid-cols-3 gap-x-2 gap-y-3"></div>
+            </div>
+          `);
+
+          this.$track.append($card);
+          this.poolNodes.push({
+            $el: $card,
+            assignedYearIndex: -1
+          });
+        }
+      }
+
+      _bindScrollEvent() {
+        this.$viewport.on('scroll', () => {
+          if (this.isTicking) return;
+          this.isTicking = true;
+          requestAnimationFrame(() => {
+            this.render();
+            this.isTicking = false;
+          });
+        });
+      }
+
+      _bindClickEvent() {
+        this.$track.on('click', '.mini-month', e => {
+          const monthIndex = $(e.currentTarget).data('month-index');
+          if (monthIndex !== undefined) {
+            this.onSelectMonth(parseInt(monthIndex, 10));
+          }
+        });
+      }
+
+      render() {
+        const scrollTop = this.$viewport.scrollTop();
+        let low = 0;
+        let high = this.yearPositions.length - 1;
+        let topVisibleIndex = 0;
+
+        while (low <= high) {
+          const mid = (low + high) >> 1;
+          if (this.yearPositions[mid].bottom >= scrollTop) {
+            topVisibleIndex = mid;
+            high = mid - 1;
+          } else {
+            low = mid + 1;
+          }
+        }
+
+        const startIndex = Math.max(0, topVisibleIndex - 1);
+        const endIndex = Math.min(this.yearPositions.length - 1, startIndex + this.POOL_SIZE - 1);
+
+        for (let i = startIndex; i <= endIndex; i++) {
+          const node = this.poolNodes[i % this.POOL_SIZE];
+
+          if (node.assignedYearIndex !== i) {
+            this._populateYearCard(node.$el, i);
+            node.assignedYearIndex = i;
+          }
+
+          node.$el.css('transform', `translate3d(0, ${this.yearPositions[i].top}px, 0)`);
+        }
+      }
+
+      _populateYearCard($card, yearIndex) {
+        const year = this.startYear + yearIndex;
+        $card.find('.year-title').text(year);
+
+        const $monthsGrid = $card.find('.months-grid');
+        $monthsGrid.empty();
+
+        const today = this.dateEngine.adToBs(new Date());
+
+        for (let m = 0; m < 12; m++) {
+          const globalMonthIndex = yearIndex * 12 + m;
+          const meta = this.dateEngine.monthMeta[globalMonthIndex];
+          const monthName = CalendarDataStore.MONTH_NAMES_BS[m];
+
+          let daysHtml = '';
+          for (let i = 0; i < meta.startDayOfWeek; i++) {
+            daysHtml += '<span class="h-[13px]"></span>';
+          }
+
+          for (let day = 1; day <= meta.totalDays; day++) {
+            const currentAdDate = new Date(meta.startAdDate.getTime() + (day - 1) * 86400000);
+            const { isHoliday } = this.eventProvider.getDayMetaData(currentAdDate);
+
+            const isToday =
+              meta.year === today.bsYear &&
+              meta.monthIndex === today.bsMonthIndex &&
+              day === today.bsDay;
+
+            let cell = '';
+            if (isToday) {
+              cell = `<span class="w-[13px] h-[13px] mx-auto rounded-full bg-iosred-500 text-white flex items-center justify-center font-bold text-[7px]">${day}</span>`;
+            } else if (isHoliday) {
+              cell = `<span class="text-iosred-600 font-medium">${day}</span>`;
+            } else {
+              cell = `<span class="text-white">${day}</span>`;
+            }
+
+            daysHtml += cell;
+          }
+
+          $monthsGrid.append(`
+            <div class="mini-month cursor-pointer flex flex-col p-1 rounded-lg hover:bg-iosgray-800/40 active:scale-95 transition-transform" data-month-index="${globalMonthIndex}">
+              <span class="text-[12px] font-semibold text-white mb-1 truncate">${monthName}</span>
+              <div class="grid grid-cols-7 text-[7px] font-medium text-iosgray-600 text-center mb-0.5 select-none">
+                <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+              </div>
+              <div class="grid grid-cols-7 text-[7px] text-center gap-y-[2px] leading-[13px] select-none h-[78px] content-start">
+                ${daysHtml}
+              </div>
+            </div>
+          `);
+        }
+      }
+
+      scrollToYear(yearIndex) {
+        const position = this.yearPositions[yearIndex];
+        if (!position) return;
+        this.$viewport[0].scrollTop = position.top;
+        this.render();
+      }
+    }
+
+    $(document).ready(() => {
+      const dateEngine = new DateEngine();
+      const eventProvider = new EventProvider();
+
+      const $monthViewport = $('#scroll-viewport');
+      const $monthTrack = $('#virtual-track');
+      const $yearViewport = $('#year-scroll-viewport');
+      const $yearTrack = $('#year-virtual-track');
+      const $weekdayHeader = $('#weekday-header');
+      const $headerBack = $('#btn-back');
+      const $headerYear = $('#btn-back span');
+
+      const $overlay = $('#event-modal-overlay');
+      const $modal = $('#event-modal');
+      const $modalBsDate = $('#modal-bs-date');
+      const $modalAdDate = $('#modal-ad-date');
+      const $modalEventsList = $('#modal-events-list');
+      const $modalClose = $('#modal-close');
+
+      let currentView = 'month';
+      let currentVisibleMeta = null;
+
+      const openModal = (globalMonthIndex, day) => {
+        const meta = dateEngine.monthMeta[globalMonthIndex];
+        const monthName = CalendarDataStore.MONTH_NAMES_BS[meta.monthIndex];
+        const adDate = new Date(meta.startAdDate.getTime() + (day - 1) * 86400000);
+
+        const dayName = CalendarDataStore.AD_DAYS[adDate.getUTCDay()];
+        const adMonth = CalendarDataStore.AD_MONTHS[adDate.getUTCMonth()];
+        const adDay = adDate.getUTCDate();
+        const adYear = adDate.getUTCFullYear();
+
+        $modalBsDate.text(`${day} ${monthName} ${meta.year}`);
+        $modalAdDate.text(`${dayName}, ${adMonth} ${adDay}, ${adYear}`);
+
+        const events = eventProvider.getEvents(meta.year, meta.monthIndex, day);
+        $modalEventsList.empty();
+
+        if (events.length === 0) {
+          $modalEventsList.append(`
+            <div class="text-iosgray-400 text-sm py-2">
+              No events scheduled for this day.
+            </div>
+          `);
+        } else {
+          events.forEach(evt => {
+            const badge = evt.isPublicHoliday
+              ? '<span class="text-[11px] font-semibold text-iosred-500 bg-iosred-500/10 px-2 py-0.5 rounded-full shrink-0 border border-iosred-500/20">Holiday</span>'
+              : '';
+
+            $modalEventsList.append(`
+              <div class="flex items-center justify-between gap-3 bg-white/5 px-3 py-2.5 rounded-xl border border-white/5">
+                <div class="flex items-center gap-2.5 min-w-0">
+                  <span class="w-1.5 h-1.5 rounded-full ${evt.isPublicHoliday ? 'bg-iosred-500' : 'bg-white/70'} shrink-0"></span>
+                  <span class="text-sm font-medium text-white truncate">${evt.title}</span>
+                </div>
+                ${badge}
+              </div>
+            `);
+          });
+        }
+
+        $overlay.removeClass('hidden');
+        requestAnimationFrame(() => {
+          $overlay.removeClass('opacity-0');
+          $modal.removeClass('scale-95').addClass('scale-100');
+        });
+      };
+
+      const closeModal = () => {
+        $overlay.addClass('opacity-0');
+        $modal.removeClass('scale-100').addClass('scale-95');
+        setTimeout(() => {
+          $overlay.addClass('hidden');
+        }, 200);
+      };
+
+      $modalClose.on('click', closeModal);
+      $overlay.on('click', (e) => {
+        if (e.target === $overlay[0]) closeModal();
+      });
+
+      const updateHeader = meta => {
+        currentVisibleMeta = meta;
+        if (currentView === 'month') {
+          $headerYear.html(`&lsaquo; ${meta.year}`);
+          $headerBack.removeClass('opacity-0 pointer-events-none');
+        }
+      };
+
+      const today = dateEngine.adToBs(new Date());
+
+      const monthScrollEngine = new VirtualScrollEngine(
+        $monthViewport,
+        $monthTrack,
+        dateEngine,
+        eventProvider,
+        updateHeader,
+        openModal,
+        today.globalMonthIndex
+      );
+
+      const switchToMonthView = globalMonthIndex => {
+        currentView = 'month';
+        $yearViewport.addClass('hidden');
+        $monthViewport.removeClass('hidden');
+        $weekdayHeader.removeClass('hidden');
+        $headerBack.removeClass('opacity-0 pointer-events-none');
+        monthScrollEngine.scrollToMonth(globalMonthIndex);
+      };
+
+      const switchToYearView = year => {
+        currentView = 'year';
+        $weekdayHeader.addClass('hidden');
+        $monthViewport.addClass('hidden');
+        $yearViewport.removeClass('hidden');
+        $headerBack.addClass('opacity-0 pointer-events-none');
+        const yearIndex = year - dateEngine.startYear;
+        yearScrollEngine.scrollToYear(yearIndex);
+      };
+
+      const yearScrollEngine = new YearVirtualScrollEngine(
+        $yearViewport,
+        $yearTrack,
+        dateEngine,
+        eventProvider,
+        globalMonthIndex => {
+          switchToMonthView(globalMonthIndex);
+        }
+      );
+
+      $headerBack.on('click', () => {
+        if (currentView === 'month' && currentVisibleMeta) {
+          switchToYearView(currentVisibleMeta.year);
+        }
+      });
+
+      $('#btn-today').on('click', () => {
+        const curToday = dateEngine.adToBs(new Date());
+        if (currentView === 'month') {
+          monthScrollEngine.scrollToMonth(curToday.globalMonthIndex);
+        } else {
+          switchToMonthView(curToday.globalMonthIndex);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
