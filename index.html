@@ -59,7 +59,7 @@
       </div>
 
       <div class="flex items-center gap-4 text-white text-lg">
-        <svg class="w-5 h-5 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg id="btn-search" class="w-5 h-5 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
         </svg>
 
@@ -92,6 +92,28 @@
         Today
       </button>
     </footer>
+
+    <div id="search-modal-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-200 flex items-center justify-center p-4">
+      <div id="search-modal" class="glass-modal w-full max-w-sm rounded-3xl p-5 shadow-2xl transform scale-95 transition-all duration-200 flex flex-col gap-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-bold text-white tracking-tight">Search Events</h3>
+          <button id="search-modal-close" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 flex items-center justify-center text-iosgray-400 hover:text-white transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 focus-within:border-iosred-500/50 transition-colors">
+          <svg class="w-4 h-4 text-iosgray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          <input id="search-input" type="text" autocomplete="off" placeholder="Search events..." class="w-full bg-transparent text-sm text-white placeholder-iosgray-400 outline-none" />
+        </div>
+
+        <div id="search-results" class="flex flex-col gap-2 max-h-80 overflow-y-auto pr-1"></div>
+      </div>
+    </div>
 
     <div id="event-modal-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-200 flex items-center justify-center p-4">
       <div id="event-modal" class="glass-modal w-full max-w-sm rounded-3xl p-5 shadow-2xl transform scale-95 transition-all duration-200 flex flex-col gap-4">
@@ -702,6 +724,95 @@
       $modalClose.on('click', closeModal);
       $overlay.on('click', (e) => {
         if (e.target === $overlay[0]) closeModal();
+      });
+
+      const $searchOverlay = $('#search-modal-overlay');
+      const $searchModal = $('#search-modal');
+      const $searchInput = $('#search-input');
+      const $searchResults = $('#search-results');
+      const $searchClose = $('#search-modal-close');
+
+      const openSearchModal = () => {
+        renderSearchResults('');
+        $searchOverlay.removeClass('hidden');
+        requestAnimationFrame(() => {
+          $searchOverlay.removeClass('opacity-0');
+          $searchModal.removeClass('scale-95').addClass('scale-100');
+          $searchInput.trigger('focus');
+        });
+      };
+
+      const closeSearchModal = () => {
+        $searchOverlay.addClass('opacity-0');
+        $searchModal.removeClass('scale-100').addClass('scale-95');
+        setTimeout(() => {
+          $searchOverlay.addClass('hidden');
+          $searchInput.val('');
+        }, 200);
+      };
+
+      const renderSearchResults = query => {
+        const currentYear = dateEngine.adToBs(new Date()).bsYear;
+        const years = [currentYear, currentYear + 1];
+        const q = query.trim().toLowerCase();
+
+        $searchResults.empty();
+
+        const matches = [];
+        if (q) {
+          Object.keys(window.BSEvents).forEach(key => {
+            const [year, month, day] = key.split('-').map(Number);
+            if (!years.includes(year)) return;
+            window.BSEvents[key].forEach(evt => {
+              if (evt.title.toLowerCase().includes(q)) {
+                matches.push({ year, monthIndex: month - 1, day, evt });
+              }
+            });
+          });
+          matches.sort((a, b) =>
+            a.year - b.year || a.monthIndex - b.monthIndex || a.day - b.day
+          );
+        }
+
+        if (!q) {
+          $searchResults.append(`
+            <div class="text-iosgray-400 text-sm py-2">
+              Search events by name for ${years[0]} and ${years[1]}.
+            </div>
+          `);
+        } else if (matches.length === 0) {
+          $searchResults.append(`
+            <div class="text-iosgray-400 text-sm py-2">
+              No events found.
+            </div>
+          `);
+        } else {
+          matches.forEach(({ year, monthIndex, day, evt }) => {
+            const monthName = CalendarDataStore.MONTH_NAMES_BS[monthIndex];
+            const badge = evt.isPublicHoliday
+              ? '<span class="text-[11px] font-semibold text-iosred-500 bg-iosred-500/10 px-2 py-0.5 rounded-full shrink-0 border border-iosred-500/20">Holiday</span>'
+              : '';
+
+            $searchResults.append(`
+              <div class="flex items-center justify-between gap-3 bg-white/5 px-3 py-2.5 rounded-xl border border-white/5">
+                <div class="flex flex-col gap-0.5 min-w-0">
+                  <span class="text-sm font-medium text-white truncate">${evt.title}</span>
+                  <span class="text-xs text-iosgray-400">${day} ${monthName} ${year}</span>
+                </div>
+                ${badge}
+              </div>
+            `);
+          });
+        }
+      };
+
+      $('#btn-search').on('click', openSearchModal);
+      $searchClose.on('click', closeSearchModal);
+      $searchOverlay.on('click', (e) => {
+        if (e.target === $searchOverlay[0]) closeSearchModal();
+      });
+      $searchInput.on('input', e => {
+        renderSearchResults(e.target.value);
       });
 
       const updateHeader = meta => {
