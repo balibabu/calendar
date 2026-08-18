@@ -1,12 +1,1160 @@
 window.BSEvents = Object.assign(window.BSEvents || {}, {
   "2083-01-01": [
-    { title: "Nawa Barsha (New Year)", isPublicHoliday: true }
+    {
+      "title": "नववर्ष २०८३ आरम्भ, भक्तपुर विश्वध्वजपातन (विस्काजात्रा)",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-01-02": [
+    {
+      "title": "सिरूवा पावनी पर्व(सिरूवा पर्व मनाउने झापा, मोरङ",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-01-03": [
+    {
+      "title": "भक्तपुर ब्रम्हायणी यात्रा, माताति चःह्रे पूजा",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-01-04": [
+    {
+      "title": "मातातीर्थ औंसी, आमाको मुख हेर्ने",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-01-05": [
+    {
+      "title": "ललितपुर मच्छिन्द्रनाथ रथारोहण",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-01-06": [
+    {
+      "title": "परशुराम जयन्ती",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-01-07": [
+    {
+      "title": "अक्षय तृतीया, शिवपार्वती विवाह",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-01-08": [
+    {
+      "title": "ललितपुर रातो मच्छिन्द्रनाथ रथ यात्रा आरम्भ, छन्द दिवस",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-01-09": [
+    {
+      "title": "आद्यगुरू शंखराचार्य जयन्ती",
+      "isPublicHoliday": false
+    }
   ],
   "2083-01-11": [
-    { title: "Loktantra Diwas", isPublicHoliday: true }
+    {
+      "title": "लोकतन्त्र दिवस",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-01-12": [
+    {
+      "title": "सीता जयन्ती",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-01-13": [
+    {
+      "title": "राष्ट्रिय फोटो पत्रकारिता दिवस",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-01-14": [
+    {
+      "title": "मोहिनी एकादशी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-01-17": [
+    {
+      "title": "नृसिंह जयन्ती, स्याङ्जा लसर्घा आलमदेवी पूजा",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-01-18": [
+    {
+      "title": "गौतमबुद्ध जयन्ती, स्वाँया पून्हिः",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-01-20": [
+    {
+      "title": "राष्ट्रिय सूचना तथा सञ्चार प्रविधि दिवस",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-01-22": [
+    {
+      "title": "मङ्गलचौथी व्रत",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-01-24": [
+    {
+      "title": "किराँत समाजसुधार दिवस",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-01-26": [
+    {
+      "title": "अष्टमीव्रत, गोरखाकाली पूजा",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-01-30": [
+    {
+      "title": "अपरा एकादशी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-02-31": [
+    {
+      "title": "दर्शश्राद्ध",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-02-01": [
+    {
+      "title": "सिथिः चःह्रे",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-02-02": [
+    {
+      "title": "शनि जयन्ती",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-02-03": [
+    {
+      "title": "अधिकमास आरम्भ, मत्स्यनारायण  मेला आरम्भ",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-02-10": [
+    {
+      "title": "अष्टमीव्रत, गोरखकाली पूजा",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-02-12": [
+    {
+      "title": "गोसाइँकुण्ड स्नान समाप्ति, वैतडी विश्वनाथ मन्दिरमा गङ्गादशहरा स्नानमेला",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-02-13": [
+    {
+      "title": "पद्मिनी एकादशी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-02-14": [
+    {
+      "title": "प्रदोषव्रत",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-02-15": [
+    {
+      "title": "गणतन्त्र दिवस",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-02-16": [
+    {
+      "title": "पूर्णिमाव्रत",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-02-17": [
+    {
+      "title": "अनला पुन्हिः",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-02-21": [
+    {
+      "title": "जातीय भेदभाव तथा छुवाछुत उन्मूलन राष्ट्रिय दिवस",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-02-24": [
+    {
+      "title": "रवि सप्तमी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-02-25": [
+    {
+      "title": "अष्टमीव्रत, गोरखकाली पूजा",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-02-28": [
+    {
+      "title": "परमा एकादशी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-02-29": [
+    {
+      "title": "प्रदोषव्रत",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-02-30": [
+    {
+      "title": "अनला चःह्रे:",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-03-01": [
+    {
+      "title": "अधिकमास समाप्ती, मत्स्यनारायण मेला समाप्ति",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-03-06": [
+    {
+      "title": "कुमार षष्ठी, सिथीःनख",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-03-07": [
+    {
+      "title": "रवी सप्तमी, कुमार यात्रा",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-03-08": [
+    {
+      "title": "वायु अष्टमी, गोरखकाली पूजा",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-03-11": [
+    {
+      "title": "निर्जला एकादशी, तुलसीको दल राख्ने",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-03-15": [
+    {
+      "title": "मष्टपूर्णिमा (ज्याःपुन्हिः), पनौती स्नान",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-03-23": [
+    {
+      "title": "अष्टमीव्रत, गोरखकाली पूजा",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-03-24": [
+    {
+      "title": "भलभल अष्टमी, देउपाटनमा त्रिशुल जात्रा",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-03-26": [
+    {
+      "title": "स्मार्तहरूको योगिनी एकादशी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-03-27": [
+    {
+      "title": "वैष्णवहरुको योगिनी एकादशी, विश्व जनसंख्या दिवस",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-03-29": [
+    {
+      "title": "दिलाचःह्रे:, भानु जयन्ती",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-03-30": [
+    {
+      "title": "दर्शश्राद्ध",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-03-32": [
+    {
+      "title": "जगन्नाथ रथयात्रा",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-04-01": [
+    {
+      "title": "साउन संक्रान्ती, लुतो फाल्ने एवं राँको बाल्ने",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-04-06": [
+    {
+      "title": "अष्टमीव्रत",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-04-09": [
+    {
+      "title": "हरिशयनी एकादशी, तुलसी रोप्ने",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-04-13": [
+    {
+      "title": "गुरू पूर्णिमा, पूर्णिमाव्रत",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-04-15": [
+    {
+      "title": "खिर खाने दिन",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-04-20": [
+    {
+      "title": "अष्टमीव्रत",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-04-24": [
+    {
+      "title": "कामिका एकादशी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-04-26": [
+    {
+      "title": "घण्टाकर्ण चतुर्दशी, गथामुग चःह्रे:",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-04-28": [
+    {
+      "title": "गुँलाधर्म आरम्भ",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-04-29": [
+    {
+      "title": "चन्द्रोदय",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-04-30": [
+    {
+      "title": "वराह जयन्ती",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-05-01": [
+    {
+      "title": "नाग पञ्चमी (नाग टाँस्ने)",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-05-02": [
+    {
+      "title": "कल्की जयन्ती",
+      "isPublicHoliday": false
+    }
   ],
   "2083-05-03": [
-    { title: "Buddha Jayanti", isPublicHoliday: true },
-    { title: "Ubhauli Parva", isPublicHoliday: false }
+    {
+      "title": "गोश्वामी तुलसीदास जयन्ती, राष्ट्रिय सूचना दिवस",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-05-04": [
+    {
+      "title": "अष्टमीव्रत, यल पञ्चदान",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-05-07": [
+    {
+      "title": "पुत्रदा एकादशी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-05-11": [
+    {
+      "title": "पूर्णिमाव्रत, बाजुरा बडिमालिका मेला",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-05-12": [
+    {
+      "title": "ऋषितर्पणी, रक्षाबन्धन",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-05-13": [
+    {
+      "title": "गाईजात्रा (सापारू)(काठमाडौं उपत्यकालाई र देशभरका नेवार समुदायका लागि मात्र बिदा)",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-05-14": [
+    {
+      "title": "रोपाइँ जात्रा, यल मत्या",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-05-16": [
+    {
+      "title": "मंगल चौथी, ललितपुर नृसिंह यात्रा",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-05-19": [
+    {
+      "title": "श्रीकृष्णजन्माष्टमी, गौरा पर्व",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-05-20": [
+    {
+      "title": "मानव वेचविखन विरुद्धको राष्ट्रिय दिवस",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-05-22": [
+    {
+      "title": "अजा एकादशी, निजामती सेवा दिवस",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-05-23": [
+    {
+      "title": "स्वयम्भूको छायाँ दर्शन, जेनजी सहिद दिवस",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-05-24": [
+    {
+      "title": "यें पञ्चदान, जुगःचह्रे: पुजा",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-05-26": [
+    {
+      "title": "कुशे औँसी, बाबुको मुख हेर्ने दिन",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-05-27": [
+    {
+      "title": "गुँलाधर्म समाप्ति",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-05-28": [
+    {
+      "title": "दरखाने दिन",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-05-29": [
+    {
+      "title": "हरितालिका व्रत, तीज(महिला कर्मचारीहरूको लागि मात्र बिदा)",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-05-30": [
+    {
+      "title": "मंगल चौथी, ऋषिपञ्चमीव्रत",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-05-31": [
+    {
+      "title": "विरूडा पञ्चमी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-06-01": [
+    {
+      "title": "विश्वकर्मा पूजा, वास्तु दिवस",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-06-03": [
+    {
+      "title": "संविधान दिवस (राष्ट्रिय दिवस), काय  अष्टमी",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-06-06": [
+    {
+      "title": "हरिपरिवर्तिनी एकादशी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-06-07": [
+    {
+      "title": "इन्द्रध्वजोत्थान, वामन द्वादशी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-06-09": [
+    {
+      "title": "कुमारी ईन्द्रजात्रा(काठमाडौं उपत्यका मात्र विदा), अनन्त चतुर्दशी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-06-10": [
+    {
+      "title": "यँया पुन्हिः, चेपाङ चोनाम पर्व",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-06-11": [
+    {
+      "title": "सोह्रश्राद्ध आरम्भ, प्रतिपदा श्राद्ध",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-06-12": [
+    {
+      "title": "द्वितीया श्राद्ध",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-06-13": [
+    {
+      "title": "तृतीया श्राद्ध",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-06-14": [
+    {
+      "title": "चतुर्थी श्राद्ध, इन्द्रध्वजपातन",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-06-15": [
+    {
+      "title": "पञ्चमी तथा षष्ठी श्राद्ध, राष्ट्रिय चलचित्र दिवस",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-06-16": [
+    {
+      "title": "सप्तमी श्राद्ध",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-06-17": [
+    {
+      "title": "अष्टमीव्रत, अष्टमी श्राद्ध",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-06-18": [
+    {
+      "title": "जितिया पर्व,(जितिया पर्व मनाउने महिला कर्मचारीहरुका लागि मात्र बिदा)",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-06-19": [
+    {
+      "title": "दशमी श्राद्ध",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-06-20": [
+    {
+      "title": "एकादशी श्राद्ध, इन्दिरा एकादशी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-06-21": [
+    {
+      "title": "द्वादशी श्राद्ध",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-06-22": [
+    {
+      "title": "त्रयोदशी श्राद्ध, जुम्ला खलङ्गामा चन्दननाथको लिङ्गो ठड्याउने",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-06-23": [
+    {
+      "title": "चतुर्दशी श्राद्ध, नःलास्वाँ चःह्रे",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-06-24": [
+    {
+      "title": "औंसी श्राद्ध, दर्शश्राद्ध",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-06-25": [
+    {
+      "title": "घटस्थापना, नवरात्र आरम्भ",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-06-29": [
+    {
+      "title": "पचली भैरव यात्रा",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-06-31": [
+    {
+      "title": "नवपत्रिका प्रवेश, फूलपाती",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-07-01": [
+    {
+      "title": "महाअष्टमी, कालरात्रि",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-07-02": [
+    {
+      "title": "जनबहाः कुछि भ्वय्",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-07-03": [
+    {
+      "title": "महानवमी, स्याक्वःत्याक्वः",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-07-04": [
+    {
+      "title": "विजया दशमी, दशैको टिका",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-07-05": [
+    {
+      "title": "पापाङकुशा एकादशी, अन्नपूर्णा  यात्रा",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-07-06": [
+    {
+      "title": "द्वादशी",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-07-08": [
+    {
+      "title": "कोजाग्रतव्रत, पूर्णिमा व्रत",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-07-09": [
+    {
+      "title": "कोजाग्रत पूर्णिमा, कतिं पुन्हिः",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-07-15": [
+    {
+      "title": "रवि सप्तमी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-07-16": [
+    {
+      "title": "अष्टमीव्रत, गोरखकाली पूजा",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-07-19": [
+    {
+      "title": "रमा एकादशी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-07-20": [
+    {
+      "title": "धन्तेरस, यमदीप दान",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-07-21": [
+    {
+      "title": "काग तिहार, धन्वन्तरी जयन्ती",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-07-22": [
+    {
+      "title": "कुकुर तिहार, नरक चतुर्दशी",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-07-23": [
+    {
+      "title": "औंसी, गाई पूजा",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-07-24": [
+    {
+      "title": "स्वःन्ति पारू, गोरू पूजा",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-07-25": [
+    {
+      "title": "भाइटीका, किजा पूजा",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-07-26": [
+    {
+      "title": "तृतीया",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-07-29": [
+    {
+      "title": "छठपर्व, डाला पूजा",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-08-01": [
+    {
+      "title": "अष्टमीव्रत, गोरखकाली पूजा",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-08-02": [
+    {
+      "title": "कुष्माण्ड नवमी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-08-03": [
+    {
+      "title": "बलम्वु महालक्ष्मी यात्रा",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-08-04": [
+    {
+      "title": "हरिबोधिनी एकादशी, तुलसी विवाह",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-08-05": [
+    {
+      "title": "चाँगुनारायण अखण्डदीप दर्शन",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-08-07": [
+    {
+      "title": "वैकुण्ठ चतुर्दशी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-08-08": [
+    {
+      "title": "गुरूनानक जयन्ती(शिख धर्मावलम्बी कर्मचारीहरुका लागि मात्र बिदा), चतुर्मासव्रत समाप्ति",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-08-15": [
+    {
+      "title": "भैरवाष्टमी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-08-17": [
+    {
+      "title": "विश्व अपाङ्ग दिवस(अपाङ्गता भएका कर्मचारीहरूका लागि बिदा), श्री गुहेश्वरी यात्रा",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-08-18": [
+    {
+      "title": "उत्पत्तिका एकादशी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-08-20": [
+    {
+      "title": "पशुपतिनाथ मेला",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-08-21": [
+    {
+      "title": "बाला चतुर्दशी, शतबीज छर्ने",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-08-24": [
+    {
+      "title": "विश्व मानव अधिकार दिवस",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-08-28": [
+    {
+      "title": "विवाह पञ्चमी, जनकपुरमा सीता विवाह पञ्चमी मेला",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-09-02": [
+    {
+      "title": "अष्टमीव्रत, गोरखकाली पूजा",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-09-05": [
+    {
+      "title": "मोक्षदा एकादशी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-09-08": [
+    {
+      "title": "पूर्णिमाव्रत",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-09-09": [
+    {
+      "title": "यमरीपुन्हीः, थिंला पुन्हीः",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-09-10": [
+    {
+      "title": "क्रिसमस डे",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-09-15": [
+    {
+      "title": "तमुल्होछार",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-09-16": [
+    {
+      "title": "अष्टमीव्रत, गोरखकाली पूजा",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-09-17": [
+    {
+      "title": "सन् २०२७ आरम्भ",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-09-19": [
+    {
+      "title": "सफला एकादशी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-09-21": [
+    {
+      "title": "गुरु गोविन्दसिंह जयन्ती",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-09-22": [
+    {
+      "title": "दिशी चह्रे:",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-09-23": [
+    {
+      "title": "अरनिको स्मृति दिवस",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-09-24": [
+    {
+      "title": "तोल ल्होसार, नेपाल ज्योतिष परिषद् स्थापना दिवस",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-09-27": [
+    {
+      "title": "पृथ्वी जयन्ती, राष्ट्रिय एकता दिवस",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-09-28": [
+    {
+      "title": "मंगलचौथी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-10-01": [
+    {
+      "title": "माघे संक्रान्ति, माघी पर्व",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-10-02": [
+    {
+      "title": "अष्टमीव्रत, सेतो मच्छिन्द्रनाथ स्नान",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-10-04": [
+    {
+      "title": "स्मार्तहरूको पुत्रदा एकादशी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-10-05": [
+    {
+      "title": "वैष्णवहरुको पुत्रदा एकादशी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-10-08": [
+    {
+      "title": "श्रीस्वस्थानीव्रत आरम्भ, मिला पुन्हिः",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-10-12": [
+    {
+      "title": "मंगल चौथी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-10-15": [
+    {
+      "title": "अष्टमीव्रत, गोरखकाली पूजा",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-10-16": [
+    {
+      "title": "सहिद दिवस",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-10-19": [
+    {
+      "title": "षटतिला एकादशी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-10-22": [
+    {
+      "title": "लैंचह्रे:",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-10-23": [
+    {
+      "title": "पशुपति क्षेत्रमा माधव नारायण मेला, त्रिवेणी मेला",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-10-24": [
+    {
+      "title": "सोनाम ल्होसार, तामाङ ल्होछार",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-10-28": [
+    {
+      "title": "वसन्तपञ्यमी, वसन्तश्रवण श्रीपञ्यमी सरस्वती पूजा(शिक्षण संस्थाहरूका लागि मात्र विदा)",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-11-01": [
+    {
+      "title": "विश्व रेडियो दिवस, अचला सप्तमी",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-11-02": [
+    {
+      "title": "अष्टमीव्रत, भिष्माष्टमी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-11-05": [
+    {
+      "title": "भीमा एकादशी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-11-06": [
+    {
+      "title": "चाँगुमा माधव नारायण मेला",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-11-07": [
+    {
+      "title": "राष्ट्रिय प्रजातन्त्र दिवस, निर्वाचन दिवस",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-11-08": [
+    {
+      "title": "श्रीस्वस्थानीव्रत समाप्ति, सि पुन्हिः",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-11-16": [
+    {
+      "title": "अष्टमीव्रत, गोरखकाली पूजा",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-11-18": [
+    {
+      "title": "माझी समुदायको लदी पूजा",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-11-20": [
+    {
+      "title": "विजया एकादशी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-11-22": [
+    {
+      "title": "महाशिवरात्रि, सिलाचह्रे:",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-11-24": [
+    {
+      "title": "अन्तर्राष्ट्रिय महिला दिवस",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-11-25": [
+    {
+      "title": "ग्याल्पो ल्होसार",
+      "isPublicHoliday": true
+    }
+  ],
+  "2083-12-02": [
+    {
+      "title": "भौमाष्टमीव्रत, चिरोत्थान",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-12-04": [
+    {
+      "title": "आमलकी एकादशी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-12-07": [
+    {
+      "title": "होली, चीरदाह",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-12-08": [
+    {
+      "title": "फागु पूर्णिमा (होलीपुन्हीः), तराइमा होली(तराईका २१ जिल्लाहरूमा बिदा)",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-12-09": [
+    {
+      "title": "नाला मच्छिन्द्रनाथ स्नान  (नाला न्हवं)",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-12-10": [
+    {
+      "title": "विश्व क्षयरोग दिवस",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-12-11": [
+    {
+      "title": "नाला मच्छिन्द्रनाथ रथयात्रा",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-12-16": [
+    {
+      "title": "शीतलाष्टमी, गोरखकाली पूजा",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-12-19": [
+    {
+      "title": "पापमोचनी एकादशी",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-12-22": [
+    {
+      "title": "पाहाँ (पासा) चह्रे:",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-12-23": [
+    {
+      "title": "घोडे जात्रा(काठमाडौं उपत्यकालाई मात्र बिदा)",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-12-24": [
+    {
+      "title": "चोभार आदिनाथ स्नान (चोभाद्यः न्हवं)",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-12-26": [
+    {
+      "title": "मत्स्येनारायण मेला, मत्स्येजयन्ती",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-12-29": [
+    {
+      "title": "चैती छठ",
+      "isPublicHoliday": false
+    }
+  ],
+  "2083-12-30": [
+    {
+      "title": "भक्तपुर विश्वध्वजोत्थान",
+      "isPublicHoliday": false
+    }
   ]
 });
