@@ -28,6 +28,7 @@
   </script>
 
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
     ::-webkit-scrollbar {
@@ -55,17 +56,12 @@
 
     <header class="z-30 bg-black px-4 py-2 flex items-center justify-between min-h-[44px]">
       <div id="btn-back" class="flex items-center gap-1 text-iosred-500 font-medium text-lg cursor-pointer transition-opacity duration-150">
-        <span>&lsaquo; 2083</span>
+        <i data-lucide="chevron-left" class="w-8 h-8"></i><span>2083</span>
       </div>
 
       <div class="flex items-center gap-4 text-white text-lg">
-        <svg id="btn-search" class="w-5 h-5 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-        </svg>
-
-        <svg class="w-5 h-5 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-        </svg>
+        <i id="btn-search" data-lucide="search" class="w-5 h-5 cursor-pointer"></i>
+        <i data-lucide="plus" class="w-5 h-5 cursor-pointer"></i>
       </div>
     </header>
 
@@ -87,9 +83,12 @@
       <div id="year-virtual-track" class="relative w-full"></div>
     </div>
 
-    <footer class="z-30 bg-black border-t border-iosgray-800 px-4 py-3 flex items-center justify-start">
-      <button id="btn-today" class="text-iosred-500 font-medium text-lg cursor-pointer">
-        Today
+    <footer class="z-30 bg-black border-t border-iosgray-800 px-4 py-3 flex items-center justify-between">
+      <button id="btn-today" class="text-iosred-500 hover:text-white transition-colors p-1 cursor-pointer flex items-center justify-center">
+        <i data-lucide="map-pin" class="w-6 h-6"></i>
+      </button>
+      <button id="btn-converter" class=" hover:text-iosred-600 transition-colors p-1 cursor-pointer flex items-center justify-center">
+        <i data-lucide="arrow-left-right" class="w-6 h-6"></i>
       </button>
     </footer>
 
@@ -98,16 +97,12 @@
         <div class="flex items-center justify-between">
           <h3 class="text-lg font-bold text-white tracking-tight">Search Events</h3>
           <button id="search-modal-close" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 flex items-center justify-center text-iosgray-400 hover:text-white transition-all">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
+            <i data-lucide="x" class="w-4 h-4"></i>
           </button>
         </div>
 
         <div class="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 focus-within:border-iosred-500/50 transition-colors">
-          <svg class="w-4 h-4 text-iosgray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-          </svg>
+          <i data-lucide="search" class="w-4 h-4 text-iosgray-400 shrink-0"></i>
           <input id="search-input" type="text" autocomplete="off" placeholder="Search events..." class="w-full bg-transparent text-sm text-white placeholder-iosgray-400 outline-none" />
         </div>
 
@@ -123,15 +118,48 @@
             <p id="modal-ad-date" class="text-sm font-medium text-iosgray-400 mt-0.5"></p>
           </div>
           <button id="modal-close" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 flex items-center justify-center text-iosgray-400 hover:text-white transition-all">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
-            </svg>
+            <i data-lucide="x" class="w-4 h-4"></i>
           </button>
         </div>
 
         <div class="border-t border-white/10"></div>
 
         <div id="modal-events-list" class="flex flex-col gap-2.5 max-h-60 overflow-y-auto pr-1"></div>
+      </div>
+    </div>
+
+    <div id="converter-modal-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-200 flex items-center justify-center p-4">
+      <div id="converter-modal" class="glass-modal w-full max-w-sm rounded-3xl p-5 shadow-2xl transform scale-95 transition-all duration-200 flex flex-col gap-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-bold text-white tracking-tight">Date Converter</h3>
+          <button id="converter-modal-close" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 flex items-center justify-center text-iosgray-400 hover:text-white transition-all">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+
+        <div class="flex flex-col gap-3">
+          <div class="bg-white/5 border border-white/10 rounded-2xl p-3 flex flex-col gap-2">
+            <div class="flex items-center justify-between text-xs font-semibold text-iosred-500 uppercase tracking-wider px-1">
+              <span>Bikram Sambat (BS)</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              <select id="conv-bs-year" class="bg-iosgray-800/90 border border-white/10 rounded-xl px-2 py-2 text-sm text-white font-medium outline-none focus:border-iosred-500 text-center cursor-pointer"></select>
+              <select id="conv-bs-month" class="bg-iosgray-800/90 border border-white/10 rounded-xl px-2 py-2 text-sm text-white font-medium outline-none focus:border-iosred-500 text-center cursor-pointer"></select>
+              <select id="conv-bs-day" class="bg-iosgray-800/90 border border-white/10 rounded-xl px-2 py-2 text-sm text-white font-medium outline-none focus:border-iosred-500 text-center cursor-pointer"></select>
+            </div>
+          </div>
+
+          <div class="bg-white/5 border border-white/10 rounded-2xl p-3 flex flex-col gap-2">
+            <div class="flex items-center justify-between text-xs font-semibold text-iosred-500 uppercase tracking-wider px-1">
+              <span>Anno Domini (AD)</span>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              <select id="conv-ad-year" class="bg-iosgray-800/90 border border-white/10 rounded-xl px-2 py-2 text-sm text-white font-medium outline-none focus:border-iosred-500 text-center cursor-pointer"></select>
+              <select id="conv-ad-month" class="bg-iosgray-800/90 border border-white/10 rounded-xl px-2 py-2 text-sm text-white font-medium outline-none focus:border-iosred-500 text-center cursor-pointer"></select>
+              <select id="conv-ad-day" class="bg-iosgray-800/90 border border-white/10 rounded-xl px-2 py-2 text-sm text-white font-medium outline-none focus:border-iosred-500 text-center cursor-pointer"></select>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -251,7 +279,7 @@
       }
 
       adToBs(adDate) {
-        const utcAd = Date.UTC(adDate.getFullYear(), adDate.getMonth(), adDate.getDate());
+        const utcAd = Date.UTC(adDate.getUTCFullYear ? adDate.getUTCFullYear() : adDate.getFullYear(), adDate.getUTCMonth ? adDate.getUTCMonth() : adDate.getMonth(), adDate.getUTCDate ? adDate.getUTCDate() : adDate.getDate());
         const diffDays = Math.floor((utcAd - CalendarDataStore.ANCHOR.adDate.getTime()) / 86400000);
 
         let low = 0;
@@ -269,6 +297,7 @@
         }
 
         const meta = this.monthMeta[monthIndex];
+        if (!meta) return null;
 
         return {
           globalMonthIndex: monthIndex,
@@ -276,6 +305,13 @@
           bsMonthIndex: meta.monthIndex,
           bsDay: diffDays - this.monthStartOffsets[monthIndex] + 1
         };
+      }
+
+      bsToAd(bsYear, bsMonthIndex, bsDay) {
+        const globalMonthIndex = (bsYear - this.startYear) * 12 + bsMonthIndex;
+        if (globalMonthIndex < 0 || globalMonthIndex >= this.monthStartOffsets.length) return null;
+        const offset = this.monthStartOffsets[globalMonthIndex] + (bsDay - 1);
+        return new Date(CalendarDataStore.ANCHOR.adDate.getTime() + offset * 86400000);
       }
     }
 
@@ -645,6 +681,8 @@
     }
 
     $(document).ready(() => {
+      lucide.createIcons();
+
       const dateEngine = new DateEngine();
       const eventProvider = new EventProvider();
 
@@ -685,7 +723,7 @@
         if (events.length === 0) {
           $modalEventsList.append(`
             <div class="text-iosgray-400 text-sm py-2">
-              No events scheduled for this day.
+              No events for this day.
             </div>
           `);
         } else {
@@ -815,10 +853,127 @@
         renderSearchResults(e.target.value);
       });
 
+      const $convOverlay = $('#converter-modal-overlay');
+      const $convModal = $('#converter-modal');
+      const $convClose = $('#converter-modal-close');
+      const $btnConverter = $('#btn-converter');
+
+      const $bsYear = $('#conv-bs-year');
+      const $bsMonth = $('#conv-bs-month');
+      const $bsDay = $('#conv-bs-day');
+
+      const $adYear = $('#conv-ad-year');
+      const $adMonth = $('#conv-ad-month');
+      const $adDay = $('#conv-ad-day');
+
+      for (let y = dateEngine.startYear; y <= dateEngine.endYear; y++) {
+        $bsYear.append(`<option value="${y}">${y}</option>`);
+      }
+      CalendarDataStore.MONTH_NAMES_BS.forEach((m, idx) => {
+        $bsMonth.append(`<option value="${idx}">${m}</option>`);
+      });
+
+      for (let y = 1935; y <= 2044; y++) {
+        $adYear.append(`<option value="${y}">${y}</option>`);
+      }
+      CalendarDataStore.AD_MONTHS.forEach((m, idx) => {
+        $adMonth.append(`<option value="${idx}">${m}</option>`);
+      });
+
+      const populateDays = ($select, maxDays, selectedVal) => {
+        $select.empty();
+        for (let d = 1; d <= maxDays; d++) {
+          $select.append(`<option value="${d}">${d}</option>`);
+        }
+        const val = Math.min(selectedVal || 1, maxDays);
+        $select.val(val);
+        return val;
+      };
+
+      let isSyncing = false;
+
+      const syncBsToAd = () => {
+        if (isSyncing) return;
+        isSyncing = true;
+        const by = parseInt($bsYear.val(), 10);
+        const bm = parseInt($bsMonth.val(), 10);
+        const maxBsDays = dateEngine.miti[by] ? dateEngine.miti[by][bm] : 30;
+        let bd = parseInt($bsDay.val(), 10) || 1;
+        bd = populateDays($bsDay, maxBsDays, bd);
+
+        const adDate = dateEngine.bsToAd(by, bm, bd);
+        if (adDate) {
+          const ay = adDate.getUTCFullYear();
+          const am = adDate.getUTCMonth();
+          const ad = adDate.getUTCDate();
+          const maxAdDays = new Date(Date.UTC(ay, am + 1, 0)).getUTCDate();
+
+          $adYear.val(ay);
+          $adMonth.val(am);
+          populateDays($adDay, maxAdDays, ad);
+        }
+        isSyncing = false;
+      };
+
+      const syncAdToBs = () => {
+        if (isSyncing) return;
+        isSyncing = true;
+        const ay = parseInt($adYear.val(), 10);
+        const am = parseInt($adMonth.val(), 10);
+        const maxAdDays = new Date(Date.UTC(ay, am + 1, 0)).getUTCDate();
+        let ad = parseInt($adDay.val(), 10) || 1;
+        ad = populateDays($adDay, maxAdDays, ad);
+
+        const bs = dateEngine.adToBs(new Date(Date.UTC(ay, am, ad)));
+        if (bs) {
+          const maxBsDays = dateEngine.miti[bs.bsYear] ? dateEngine.miti[bs.bsYear][bs.bsMonthIndex] : 30;
+          $bsYear.val(bs.bsYear);
+          $bsMonth.val(bs.bsMonthIndex);
+          populateDays($bsDay, maxBsDays, bs.bsDay);
+        }
+        isSyncing = false;
+      };
+
+      $bsYear.on('change', syncBsToAd);
+      $bsMonth.on('change', syncBsToAd);
+      $bsDay.on('change', syncBsToAd);
+
+      $adYear.on('change', syncAdToBs);
+      $adMonth.on('change', syncAdToBs);
+      $adDay.on('change', syncAdToBs);
+
+      const openConverterModal = () => {
+        const curToday = dateEngine.adToBs(new Date());
+        $bsYear.val(curToday.bsYear);
+        $bsMonth.val(curToday.bsMonthIndex);
+        populateDays($bsDay, dateEngine.miti[curToday.bsYear] ? dateEngine.miti[curToday.bsYear][curToday.bsMonthIndex] : 30, curToday.bsDay);
+        syncBsToAd();
+
+        $convOverlay.removeClass('hidden');
+        requestAnimationFrame(() => {
+          $convOverlay.removeClass('opacity-0');
+          $convModal.removeClass('scale-95').addClass('scale-100');
+        });
+      };
+
+      const closeConverterModal = () => {
+        $convOverlay.addClass('opacity-0');
+        $convModal.removeClass('scale-100').addClass('scale-95');
+        setTimeout(() => {
+          $convOverlay.addClass('hidden');
+        }, 200);
+      };
+
+      $btnConverter.on('click', openConverterModal);
+      $convClose.on('click', closeConverterModal);
+      $convOverlay.on('click', (e) => {
+        if (e.target === $convOverlay[0]) closeConverterModal();
+      });
+
       const updateHeader = meta => {
         currentVisibleMeta = meta;
         if (currentView === 'month') {
-          $headerYear.html(`&lsaquo; ${meta.year}`);
+          $headerYear.html(`${meta.year}`);
           $headerBack.removeClass('opacity-0 pointer-events-none');
         }
       };
