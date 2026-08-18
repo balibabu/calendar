@@ -405,7 +405,7 @@
           const currentAdDate = new Date(meta.startAdDate.getTime() + (day - 1) * 86400000);
           const { isHoliday } = this.eventProvider.getDayMetaData(currentAdDate);
           const events = this.eventProvider.getEvents(meta.year, meta.monthIndex, day);
-          const hasEvents = events.length > 0;
+          const hasEvents = events.some(evt => evt.isPublicHoliday);
 
           const isToday =
             meta.year === today.bsYear &&
