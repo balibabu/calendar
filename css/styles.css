@@ -1,0 +1,16 @@
+::-webkit-scrollbar {
+  width: 0;
+}
+
+.month-card-node,
+.year-card-node {
+  will-change: transform;
+  contain: layout style paint;
+}
+
+.glass-modal {
+  background: rgba(30, 30, 32, 0.75);
+  backdrop-filter: blur(25px) saturate(190%);
+  -webkit-backdrop-filter: blur(25px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
