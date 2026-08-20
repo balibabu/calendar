@@ -176,6 +176,41 @@ $(document).ready(() => {
   const $convClose = $('#converter-modal-close');
   const $btnConverter = $('#btn-converter');
 
+  const $upcomingOverlay = $('#upcoming-modal-overlay');
+  const $upcomingModal = $('#upcoming-modal');
+  const $upcomingClose = $('#upcoming-modal-close');
+  const $btnUpcoming = $('#btn-upcoming');
+
+  const upcomingEngine = new UpcomingEventsEngine(
+    $('#upcoming-scroll-viewport'),
+    $('#upcoming-virtual-track'),
+    dateEngine,
+    eventProvider
+  );
+
+  const openUpcomingModal = () => {
+    $upcomingOverlay.removeClass('hidden');
+    requestAnimationFrame(() => {
+      $upcomingOverlay.removeClass('opacity-0');
+      $upcomingModal.removeClass('scale-95').addClass('scale-100');
+      upcomingEngine.reset();
+    });
+  };
+
+  const closeUpcomingModal = () => {
+    $upcomingOverlay.addClass('opacity-0');
+    $upcomingModal.removeClass('scale-100').addClass('scale-95');
+    setTimeout(() => {
+      $upcomingOverlay.addClass('hidden');
+    }, 200);
+  };
+
+  $btnUpcoming.on('click', openUpcomingModal);
+  $upcomingClose.on('click', closeUpcomingModal);
+  $upcomingOverlay.on('click', (e) => {
+    if (e.target === $upcomingOverlay[0]) closeUpcomingModal();
+  });
+
   const $bsYear = $('#conv-bs-year');
   const $bsMonth = $('#conv-bs-month');
   const $bsDay = $('#conv-bs-day');
