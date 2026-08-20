@@ -3,35 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bikram Sambat Calendar (iOS Style)</title>
+  <title>Patro</title>
+  <meta name="description" content="Bikram Sambat calendar with events, search and date converter.">
+  <meta name="theme-color" content="#000000">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            iosgray: {
-              400: '#8e8e93',
-              600: '#525252',
-              800: '#1c1c1e',
-              900: '#121214'
-            },
-            iosred: {
-              500: '#ff3b30',
-              600: '#e5332c'
-            }
-          }
-        }
-      }
-    };
-  </script>
-
+  <link rel="stylesheet" href="css/tailwind-build.css?v=1">
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/lucide@0.544.0/dist/umd/lucide.min.js"></script>
 
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/styles.css?v=1">
 </head>
 
 <body class="bg-black text-white font-sans antialiased h-screen w-screen overflow-hidden flex flex-col justify-center items-center select-none">
@@ -169,14 +150,14 @@
 
   </div>
 
-  <script src="miti.js"></script>
-  <script src="event_2083.js"></script>
+  <script src="miti.js?v=1"></script>
+  <script src="event_2083.js?v=1"></script>
 
-  <script src="js/data-store.js"></script>
-  <script src="js/date-engine.js"></script>
-  <script src="js/month-scroll-engine.js"></script>
-  <script src="js/year-scroll-engine.js"></script>
-  <script src="js/upcoming-events.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/data-store.js?v=1"></script>
+  <script src="js/date-engine.js?v=1"></script>
+  <script src="js/month-scroll-engine.js?v=1"></script>
+  <script src="js/year-scroll-engine.js?v=1"></script>
+  <script src="js/upcoming-events.js?v=1"></script>
+  <script src="js/app.js?v=1"></script>
 </body>
 </html>
