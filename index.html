@@ -1,163 +1,137 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Patro</title>
-  <meta name="description" content="Bikram Sambat calendar with events, search and date converter.">
-  <meta name="theme-color" content="#000000">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Bikram Sambat Calendar</title>
+  </head>
+  <body class="bg-black text-white font-sans antialiased h-screen w-screen overflow-hidden flex flex-col justify-center items-center select-none">
+    <div class="w-full max-w-md h-full sm:h-[92vh] flex flex-col bg-black overflow-hidden relative">
+      <header class="z-30 bg-black px-4 py-2 flex items-center justify-between min-h-[44px]">
+        <div id="btn-back" class="flex items-center gap-1 text-iosred-500 font-medium text-lg cursor-pointer transition-opacity duration-150">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          <span>2083</span>
+        </div>
+        <div class="flex items-center gap-4 text-white text-lg">
+          <button id="btn-search" class="cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          </button>
+        </div>
+      </header>
 
-  <link rel="stylesheet" href="css/tailwind-build.css?v=1">
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <script src="https://unpkg.com/lucide@0.544.0/dist/umd/lucide.min.js"></script>
-
-  <link rel="stylesheet" href="css/styles.css?v=1">
-</head>
-
-<body class="bg-black text-white font-sans antialiased h-screen w-screen overflow-hidden flex flex-col justify-center items-center select-none">
-
-  <div class="w-full max-w-md h-full sm:h-[92vh] flex flex-col bg-black overflow-hidden relative">
-
-    <header class="z-30 bg-black px-4 py-2 flex items-center justify-between min-h-[44px]">
-      <div id="btn-back" class="flex items-center gap-1 text-iosred-500 font-medium text-lg cursor-pointer transition-opacity duration-150">
-        <i data-lucide="chevron-left" class="w-8 h-8"></i><span>2083</span>
+      <div id="weekday-header" class="grid grid-cols-7 text-center bg-black py-1.5 px-4 text-xs font-medium text-iosgray-600 z-20 border-b border-iosgray-800">
+        <div>S</div>
+        <div>M</div>
+        <div>T</div>
+        <div>W</div>
+        <div>T</div>
+        <div>F</div>
+        <div>S</div>
       </div>
 
-      <div class="flex items-center gap-4 text-white text-lg">
-        <i id="btn-search" data-lucide="search" class="w-5 h-5 cursor-pointer"></i>
-        <i data-lucide="plus" class="w-5 h-5 cursor-pointer"></i>
+      <div id="scroll-viewport" class="flex-1 overflow-y-auto relative w-full">
+        <div id="virtual-track" class="relative w-full"></div>
       </div>
-    </header>
 
-    <div id="weekday-header" class="grid grid-cols-7 text-center bg-black py-1.5 px-4 text-xs font-medium text-iosgray-600 z-20 border-b border-iosgray-800">
-      <div>S</div>
-      <div>M</div>
-      <div>T</div>
-      <div>W</div>
-      <div>T</div>
-      <div>F</div>
-      <div>S</div>
-    </div>
+      <div id="year-scroll-viewport" class="flex-1 overflow-y-auto relative w-full hidden">
+        <div id="year-virtual-track" class="relative w-full"></div>
+      </div>
 
-    <div id="scroll-viewport" class="flex-1 overflow-y-auto relative w-full">
-      <div id="virtual-track" class="relative w-full"></div>
-    </div>
-
-    <div id="year-scroll-viewport" class="flex-1 overflow-y-auto relative w-full hidden">
-      <div id="year-virtual-track" class="relative w-full"></div>
-    </div>
-
-    <footer class="z-30 bg-black border-t border-iosgray-800 px-4 py-3 flex items-center justify-between">
-      <button id="btn-today" class="text-iosred-500 hover:text-white transition-colors p-1 cursor-pointer flex items-center justify-center">
-        <i data-lucide="map-pin" class="w-6 h-6"></i>
-      </button>
-      <span>
-          <button id="btn-converter" class=" hover:text-iosred-600 transition-colors p-1 cursor-pointer">
-            <i data-lucide="arrow-left-right" class="w-6 h-6"></i>
+      <footer class="z-30 bg-black border-t border-iosgray-800 px-4 py-3 flex items-center justify-between">
+        <button id="btn-today" class="text-iosred-500 hover:text-white transition-colors p-1 cursor-pointer flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>
+        </button>
+        <span>
+          <button id="btn-converter" class="hover:text-iosred-600 transition-colors p-1 cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg>
           </button>
           <button id="btn-upcoming" class="hover:text-iosred-600 transition-colors p-1 cursor-pointer">
-            <i data-lucide="calendar-days" class="w-6 h-6"></i>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
           </button>
-      </span>
-    </footer>
+        </span>
+      </footer>
 
-    <div id="search-modal-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-200 flex items-center justify-center p-4">
-      <div id="search-modal" class="glass-modal w-full max-w-sm rounded-3xl p-5 shadow-2xl transform scale-95 transition-all duration-200 flex flex-col gap-4">
-        <div class="flex items-center justify-between">
-          <h3 class="text-lg font-bold text-white tracking-tight">Search Events</h3>
-          <button id="search-modal-close" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 flex items-center justify-center text-iosgray-400 hover:text-white transition-all">
-            <i data-lucide="x" class="w-4 h-4"></i>
-          </button>
-        </div>
-
-        <div class="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 focus-within:border-iosred-500/50 transition-colors">
-          <i data-lucide="search" class="w-4 h-4 text-iosgray-400 shrink-0"></i>
-          <input id="search-input" type="text" autocomplete="off" placeholder="Search events..." class="w-full bg-transparent text-sm text-white placeholder-iosgray-400 outline-none" />
-        </div>
-
-        <div id="search-results" class="flex flex-col gap-2 max-h-80 overflow-y-auto pr-1"></div>
-      </div>
-    </div>
-
-    <div id="event-modal-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-200 flex items-center justify-center p-4">
-      <div id="event-modal" class="glass-modal w-full max-w-sm rounded-3xl p-5 shadow-2xl transform scale-95 transition-all duration-200 flex flex-col gap-4">
-        <div class="flex items-start justify-between">
-          <div>
-            <h3 id="modal-bs-date" class="text-2xl font-bold text-white tracking-tight"></h3>
-            <p id="modal-ad-date" class="text-sm font-medium text-iosgray-400 mt-0.5"></p>
+      <div id="search-modal-overlay" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-200 flex items-center justify-center p-4">
+        <div id="search-modal" class="glass-modal w-full max-w-sm rounded-3xl p-5 shadow-2xl transform scale-95 transition-all duration-200 flex flex-col gap-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-bold text-white tracking-tight">Search Events</h3>
+            <button id="search-modal-close" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 flex items-center justify-center text-iosgray-400 hover:text-white transition-all cursor-pointer">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
           </div>
-          <button id="modal-close" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 flex items-center justify-center text-iosgray-400 hover:text-white transition-all">
-            <i data-lucide="x" class="w-4 h-4"></i>
-          </button>
-        </div>
-
-        <div class="border-t border-white/10"></div>
-
-        <div id="modal-events-list" class="flex flex-col gap-2.5 max-h-60 overflow-y-auto pr-1"></div>
-      </div>
-    </div>
-
-    <div id="upcoming-modal-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-200 flex items-center justify-center p-4">
-      <div id="upcoming-modal" class="glass-modal w-full max-w-sm rounded-3xl p-5 shadow-2xl transform scale-95 transition-all duration-200 flex flex-col gap-4">
-        <div class="flex items-center justify-between">
-          <h3 class="text-lg font-bold text-white tracking-tight">Events</h3>
-          <button id="upcoming-modal-close" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 flex items-center justify-center text-iosgray-400 hover:text-white transition-all">
-            <i data-lucide="x" class="w-4 h-4"></i>
-          </button>
-        </div>
-
-        <div id="upcoming-scroll-viewport" class="max-h-96 overflow-y-auto relative w-full">
-          <div id="upcoming-virtual-track" class="relative w-full"></div>
-        </div>
-      </div>
-    </div>
-
-    <div id="converter-modal-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-200 flex items-center justify-center p-4">
-      <div id="converter-modal" class="glass-modal w-full max-w-sm rounded-3xl p-5 shadow-2xl transform scale-95 transition-all duration-200 flex flex-col gap-4">
-        <div class="flex items-center justify-between">
-          <h3 class="text-lg font-bold text-white tracking-tight">Date Converter</h3>
-          <button id="converter-modal-close" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 flex items-center justify-center text-iosgray-400 hover:text-white transition-all">
-            <i data-lucide="x" class="w-4 h-4"></i>
-          </button>
-        </div>
-
-        <div class="flex flex-col gap-3">
-          <div class="bg-white/5 border border-white/10 rounded-2xl p-3 flex flex-col gap-2">
-            <div class="flex items-center justify-between text-xs font-semibold text-iosred-500 uppercase tracking-wider px-1">
-              <span>Bikram Sambat (BS)</span>
-            </div>
-            <div class="grid grid-cols-3 gap-2">
-              <select id="conv-bs-year" class="bg-iosgray-800/90 border border-white/10 rounded-xl px-2 py-2 text-sm text-white font-medium outline-none focus:border-iosred-500 text-center cursor-pointer"></select>
-              <select id="conv-bs-month" class="bg-iosgray-800/90 border border-white/10 rounded-xl px-2 py-2 text-sm text-white font-medium outline-none focus:border-iosred-500 text-center cursor-pointer"></select>
-              <select id="conv-bs-day" class="bg-iosgray-800/90 border border-white/10 rounded-xl px-2 py-2 text-sm text-white font-medium outline-none focus:border-iosred-500 text-center cursor-pointer"></select>
-            </div>
+          <div class="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 focus-within:border-iosred-500/50 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input id="search-input" type="text" autocomplete="off" placeholder="Search events..." class="w-full bg-transparent text-sm text-white placeholder-iosgray-400 outline-none" />
           </div>
+          <div id="search-results" class="flex flex-col gap-2 max-h-80 overflow-y-auto pr-1"></div>
+        </div>
+      </div>
 
-          <div class="bg-white/5 border border-white/10 rounded-2xl p-3 flex flex-col gap-2">
-            <div class="flex items-center justify-between text-xs font-semibold text-iosred-500 uppercase tracking-wider px-1">
-              <span>Anno Domini (AD)</span>
+      <div id="event-modal-overlay" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-200 flex items-center justify-center p-4">
+        <div id="event-modal" class="glass-modal w-full max-w-sm rounded-3xl p-5 shadow-2xl transform scale-95 transition-all duration-200 flex flex-col gap-4">
+          <div class="flex items-start justify-between">
+            <div>
+              <h3 id="modal-bs-date" class="text-2xl font-bold text-white tracking-tight"></h3>
+              <p id="modal-ad-date" class="text-sm font-medium text-iosgray-400 mt-0.5"></p>
             </div>
-            <div class="grid grid-cols-3 gap-2">
-              <select id="conv-ad-year" class="bg-iosgray-800/90 border border-white/10 rounded-xl px-2 py-2 text-sm text-white font-medium outline-none focus:border-iosred-500 text-center cursor-pointer"></select>
-              <select id="conv-ad-month" class="bg-iosgray-800/90 border border-white/10 rounded-xl px-2 py-2 text-sm text-white font-medium outline-none focus:border-iosred-500 text-center cursor-pointer"></select>
-              <select id="conv-ad-day" class="bg-iosgray-800/90 border border-white/10 rounded-xl px-2 py-2 text-sm text-white font-medium outline-none focus:border-iosred-500 text-center cursor-pointer"></select>
+            <button id="modal-close" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 flex items-center justify-center text-iosgray-400 hover:text-white transition-all cursor-pointer">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+          </div>
+          <div class="border-t border-white/10"></div>
+          <div id="modal-events-list" class="flex flex-col gap-2.5 max-h-60 overflow-y-auto pr-1"></div>
+        </div>
+      </div>
+
+      <div id="upcoming-modal-overlay" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-200 flex items-center justify-center p-4">
+        <div id="upcoming-modal" class="glass-modal w-full max-w-sm rounded-3xl p-5 shadow-2xl transform scale-95 transition-all duration-200 flex flex-col gap-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-bold text-white tracking-tight">Events</h3>
+            <button id="upcoming-modal-close" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 flex items-center justify-center text-iosgray-400 hover:text-white transition-all cursor-pointer">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+          </div>
+          <div id="upcoming-scroll-viewport" class="max-h-96 overflow-y-auto relative w-full">
+            <div id="upcoming-virtual-track" class="relative w-full"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="converter-modal-overlay" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-200 flex items-center justify-center p-4">
+        <div id="converter-modal" class="glass-modal w-full max-w-sm rounded-3xl p-5 shadow-2xl transform scale-95 transition-all duration-200 flex flex-col gap-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-bold text-white tracking-tight">Date Converter</h3>
+            <button id="converter-modal-close" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 flex items-center justify-center text-iosgray-400 hover:text-white transition-all cursor-pointer">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+          </div>
+          <div class="flex flex-col gap-3">
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-3 flex flex-col gap-2">
+              <div class="flex items-center justify-between text-xs font-semibold text-iosred-500 uppercase tracking-wider px-1">
+                <span>Bikram Sambat (BS)</span>
+              </div>
+              <div class="grid grid-cols-3 gap-2">
+                <select id="conv-bs-year" class="bg-iosgray-800/90 border border-white/10 rounded-xl px-2 py-2 text-sm text-white font-medium outline-none focus:border-iosred-500 text-center cursor-pointer"></select>
+                <select id="conv-bs-month" class="bg-iosgray-800/90 border border-white/10 rounded-xl px-2 py-2 text-sm text-white font-medium outline-none focus:border-iosred-500 text-center cursor-pointer"></select>
+                <select id="conv-bs-day" class="bg-iosgray-800/90 border border-white/10 rounded-xl px-2 py-2 text-sm text-white font-medium outline-none focus:border-iosred-500 text-center cursor-pointer"></select>
+              </div>
+            </div>
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-3 flex flex-col gap-2">
+              <div class="flex items-center justify-between text-xs font-semibold text-iosred-500 uppercase tracking-wider px-1">
+                <span>Anno Domini (AD)</span>
+              </div>
+              <div class="grid grid-cols-3 gap-2">
+                <select id="conv-ad-year" class="bg-iosgray-800/90 border border-white/10 rounded-xl px-2 py-2 text-sm text-white font-medium outline-none focus:border-iosred-500 text-center cursor-pointer"></select>
+                <select id="conv-ad-month" class="bg-iosgray-800/90 border border-white/10 rounded-xl px-2 py-2 text-sm text-white font-medium outline-none focus:border-iosred-500 text-center cursor-pointer"></select>
+                <select id="conv-ad-day" class="bg-iosgray-800/90 border border-white/10 rounded-xl px-2 py-2 text-sm text-white font-medium outline-none focus:border-iosred-500 text-center cursor-pointer"></select>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-
-  </div>
-
-  <script src="miti.js?v=1"></script>
-  <script src="event_2083.js?v=1"></script>
-
-  <script src="js/data-store.js?v=1"></script>
-  <script src="js/date-engine.js?v=1"></script>
-  <script src="js/month-scroll-engine.js?v=1"></script>
-  <script src="js/year-scroll-engine.js?v=1"></script>
-  <script src="js/upcoming-events.js?v=1"></script>
-  <script src="js/app.js?v=1"></script>
-</body>
+    <script type="module" src="/src/main.js"></script>
+  </body>
 </html>

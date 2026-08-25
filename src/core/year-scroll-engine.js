@@ -1,14 +1,16 @@
-class YearVirtualScrollEngine {
-  constructor($viewport, $track, dateEngine, eventProvider, onSelectMonth) {
-    this.$viewport = $viewport;
-    this.$track = $track;
+import { MONTH_NAMES_BS } from '../data/calendar-constants.js';
+import { todayAdTime } from './date-engine.js';
+
+export class YearScrollEngine {
+  constructor(viewport, track, dateEngine, eventProvider, onSelectMonth) {
+    this.viewport = viewport;
+    this.track = track;
     this.dateEngine = dateEngine;
     this.eventProvider = eventProvider;
     this.onSelectMonth = onSelectMonth;
 
     this.startYear = dateEngine.startYear;
-    this.endYear = dateEngine.endYear;
-    this.totalYears = this.endYear - this.startYear + 1;
+    this.totalYears = dateEngine.endYear - dateEngine.startYear + 1;
 
     this.POOL_SIZE = 6;
     this.YEAR_HEIGHT = 580;
@@ -37,33 +39,33 @@ class YearVirtualScrollEngine {
       currentY += this.YEAR_HEIGHT + this.YEAR_MARGIN;
     }
 
-    this.$track.css('height', `${currentY}px`);
+    this.track.style.height = `${currentY}px`;
   }
 
   _createDOMPool() {
-    this.$track.empty();
+    this.track.innerHTML = '';
     this.poolNodes = [];
 
     for (let i = 0; i < this.POOL_SIZE; i++) {
-      const $card = $(`
-        <div class="year-card-node absolute left-0 right-0 mx-auto w-full max-w-full bg-black px-4 pt-2 pb-4 h-[580px] overflow-hidden">
-          <div class="year-card-header flex items-center justify-start pb-2 border-b border-iosgray-800 mb-3 h-[44px]">
-            <span class="year-title font-bold text-2xl text-iosred-500"></span>
-          </div>
-          <div class="months-grid grid grid-cols-3 gap-x-2 gap-y-3"></div>
+      const card = document.createElement('div');
+      card.className = 'year-card-node absolute left-0 right-0 mx-auto w-full max-w-full bg-black px-4 pt-2 pb-4 h-[580px] overflow-hidden';
+      card.innerHTML = `
+        <div class="year-card-header flex items-center justify-start pb-2 border-b border-iosgray-800 mb-3 h-[44px]">
+          <span class="year-title font-bold text-2xl text-iosred-500"></span>
         </div>
-      `);
+        <div class="months-grid grid grid-cols-3 gap-x-2 gap-y-3"></div>
+      `;
 
-      this.$track.append($card);
+      this.track.appendChild(card);
       this.poolNodes.push({
-        $el: $card,
+        el: card,
         assignedYearIndex: -1
       });
     }
   }
 
   _bindScrollEvent() {
-    this.$viewport.on('scroll', () => {
+    this.viewport.addEventListener('scroll', () => {
       if (this.isTicking) return;
       this.isTicking = true;
       requestAnimationFrame(() => {
@@ -74,8 +76,10 @@ class YearVirtualScrollEngine {
   }
 
   _bindClickEvent() {
-    this.$track.on('click', '.mini-month', e => {
-      const monthIndex = $(e.currentTarget).data('month-index');
+    this.track.addEventListener('click', (e) => {
+      const target = e.target.closest('.mini-month');
+      if (!target) return;
+      const monthIndex = target.dataset.monthIndex;
       if (monthIndex !== undefined) {
         this.onSelectMonth(parseInt(monthIndex, 10));
       }
@@ -83,7 +87,7 @@ class YearVirtualScrollEngine {
   }
 
   render() {
-    const scrollTop = this.$viewport.scrollTop();
+    const scrollTop = this.viewport.scrollTop;
     let low = 0;
     let high = this.yearPositions.length - 1;
     let topVisibleIndex = 0;
@@ -105,27 +109,27 @@ class YearVirtualScrollEngine {
       const node = this.poolNodes[i % this.POOL_SIZE];
 
       if (node.assignedYearIndex !== i) {
-        this._populateYearCard(node.$el, i);
+        this._populateYearCard(node.el, i);
         node.assignedYearIndex = i;
       }
 
-      node.$el.css('transform', `translate3d(0, ${this.yearPositions[i].top}px, 0)`);
+      node.el.style.transform = `translate3d(0, ${this.yearPositions[i].top}px, 0)`;
     }
   }
 
-  _populateYearCard($card, yearIndex) {
+  _populateYearCard(card, yearIndex) {
     const year = this.startYear + yearIndex;
-    $card.find('.year-title').text(year);
+    card.querySelector('.year-title').textContent = year;
 
-    const $monthsGrid = $card.find('.months-grid');
-    $monthsGrid.empty();
+    const monthsGrid = card.querySelector('.months-grid');
+    let html = '';
 
-    const today = this.dateEngine.adToBs(new Date());
+    const today = this.dateEngine.adToBs(todayAdTime());
 
     for (let m = 0; m < 12; m++) {
       const globalMonthIndex = yearIndex * 12 + m;
       const meta = this.dateEngine.monthMeta[globalMonthIndex];
-      const monthName = CalendarDataStore.MONTH_NAMES_BS[m];
+      const monthName = MONTH_NAMES_BS[m];
 
       let daysHtml = '';
       for (let i = 0; i < meta.startDayOfWeek; i++) {
@@ -133,8 +137,8 @@ class YearVirtualScrollEngine {
       }
 
       for (let day = 1; day <= meta.totalDays; day++) {
-        const currentAdDate = new Date(meta.startAdDate.getTime() + (day - 1) * 86400000);
-        const { isHoliday } = this.eventProvider.getDayMetaData(currentAdDate);
+        const currentAdTime = meta.startAdTime + (day - 1) * 86400000;
+        const { isHoliday } = this.eventProvider.getDayMetaData(currentAdTime);
 
         const isToday =
           meta.year === today.bsYear &&
@@ -153,7 +157,7 @@ class YearVirtualScrollEngine {
         daysHtml += cell;
       }
 
-      $monthsGrid.append(`
+      html += `
         <div class="mini-month cursor-pointer flex flex-col p-1 rounded-lg hover:bg-iosgray-800/40 active:scale-95 transition-transform" data-month-index="${globalMonthIndex}">
           <span class="text-[12px] font-semibold text-white mb-1 truncate">${monthName}</span>
           <div class="grid grid-cols-7 text-[7px] font-medium text-iosgray-600 text-center mb-0.5 select-none">
@@ -163,14 +167,16 @@ class YearVirtualScrollEngine {
             ${daysHtml}
           </div>
         </div>
-      `);
+      `;
     }
+
+    monthsGrid.innerHTML = html;
   }
 
   scrollToYear(yearIndex) {
     const position = this.yearPositions[yearIndex];
     if (!position) return;
-    this.$viewport[0].scrollTop = position.top;
+    this.viewport.scrollTop = position.top;
     this.render();
   }
 }

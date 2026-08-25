@@ -1,7 +1,13 @@
-class UpcomingEventsEngine {
-  constructor($viewport, $track, dateEngine, eventProvider) {
-    this.$viewport = $viewport;
-    this.$track = $track;
+import { BS_EVENTS } from '../data/events.js';
+import { MONTH_NAMES_BS, AD_MONTHS, AD_DAYS } from '../data/calendar-constants.js';
+import { todayAdTime } from './date-engine.js';
+
+const DAY_MS = 86400000;
+
+export class UpcomingEventsEngine {
+  constructor(viewport, track, dateEngine, eventProvider) {
+    this.viewport = viewport;
+    this.track = track;
     this.dateEngine = dateEngine;
     this.eventProvider = eventProvider;
 
@@ -20,7 +26,7 @@ class UpcomingEventsEngine {
 
     this._createDOMPool();
 
-    this.$viewport.on('scroll', () => {
+    this.viewport.addEventListener('scroll', () => {
       if (this.isTicking) return;
       this.isTicking = true;
       requestAnimationFrame(() => {
@@ -39,7 +45,7 @@ class UpcomingEventsEngine {
       const prefix = `${meta.year}-${String(meta.monthIndex + 1).padStart(2, '0')}-`;
 
       for (let day = 1; day <= meta.totalDays; day++) {
-        const events = window.BSEvents[prefix + String(day).padStart(2, '0')];
+        const events = BS_EVENTS[prefix + String(day).padStart(2, '0')];
         if (events && events.length > 0) {
           entries.push({ gmi, day, events });
         }
@@ -68,37 +74,48 @@ class UpcomingEventsEngine {
 
     if (this.entries.length === 0) {
       this.trackHeight = this.NOTE_H + 8;
-      this.$startNote.text('No events found.');
-      this.$endNote.addClass('hidden');
+      this.startNote.textContent = 'No events found.';
+      this.endNote.classList.add('hidden');
     } else {
       this.trackHeight = cursor - this.ENTRY_MARGIN + 8 + this.NOTE_H;
-      this.$startNote.text('No earlier events.');
-      this.$endNote.removeClass('hidden');
+      this.startNote.textContent = 'No earlier events.';
+      this.endNote.classList.remove('hidden');
     }
 
-    this.$track.css('height', `${this.trackHeight}px`);
+    this.track.style.height = `${this.trackHeight}px`;
   }
 
   _createDOMPool() {
-    this.$track.empty();
+    this.track.innerHTML = '';
     this.poolNodes = [];
 
-    this.$startNote = $('<div class="absolute left-0 right-0 text-iosgray-400 text-sm text-center py-2"></div>');
-    this.$endNote = $('<div class="absolute left-0 right-0 text-iosgray-400 text-sm text-center py-2"></div>');
-    this.$track.append(this.$startNote, this.$endNote);
+    this.startNote = document.createElement('div');
+    this.startNote.className = 'absolute left-0 right-0 text-iosgray-400 text-sm text-center py-2';
+
+    this.endNote = document.createElement('div');
+    this.endNote.className = 'absolute left-0 right-0 text-iosgray-400 text-sm text-center py-2';
+    this.endNote.style.top = '0px';
+
+    this.track.appendChild(this.startNote);
+    this.track.appendChild(this.endNote);
 
     for (let i = 0; i < this.POOL_SIZE; i++) {
-      const $el = $('<div class="upcoming-entry-node absolute left-0 right-0 flex flex-col gap-1.5"></div>');
-      this.$track.append($el);
+      const el = document.createElement('div');
+      el.className = 'upcoming-entry-node absolute left-0 right-0 flex flex-col gap-1.5';
+      this.track.appendChild(el);
       this.poolNodes.push({
-        $el,
+        el,
         assignedIndex: -1
       });
     }
   }
 
+  _positionEndNote() {
+    this.endNote.style.top = `${this.trackHeight - this.NOTE_H}px`;
+  }
+
   _findTodayIndex() {
-    const today = this.dateEngine.adToBs(new Date());
+    const today = this.dateEngine.adToBs(todayAdTime());
     const todayGmi = today.globalMonthIndex;
 
     let low = 0;
@@ -122,7 +139,7 @@ class UpcomingEventsEngine {
   render() {
     if (!this.entries || this.entries.length === 0) return;
 
-    const scrollTop = this.$viewport.scrollTop();
+    const scrollTop = this.viewport.scrollTop;
     let low = 0;
     let high = this.positions.length - 1;
     let topVisibleIndex = 0;
@@ -144,30 +161,31 @@ class UpcomingEventsEngine {
       const node = this.poolNodes[i % this.POOL_SIZE];
 
       if (node.assignedIndex !== i) {
-        this._populateEntryNode(node.$el, i);
+        this._populateEntryNode(node.el, i);
         node.assignedIndex = i;
       }
 
-      node.$el.css('transform', `translate3d(0, ${this.positions[i].top}px, 0)`);
+      node.el.style.transform = `translate3d(0, ${this.positions[i].top}px, 0)`;
     }
   }
 
-  _populateEntryNode($el, index) {
+  _populateEntryNode(el, index) {
     const entry = this.entries[index];
     const meta = this.dateEngine.monthMeta[entry.gmi];
-    const monthName = CalendarDataStore.MONTH_NAMES_BS[meta.monthIndex];
-    const adDate = new Date(meta.startAdDate.getTime() + (entry.day - 1) * 86400000);
-    const dayName = CalendarDataStore.AD_DAYS[adDate.getUTCDay()];
-    const adMonth = CalendarDataStore.AD_MONTHS[adDate.getUTCMonth()];
+    const monthName = MONTH_NAMES_BS[meta.monthIndex];
+    const adTime = meta.startAdTime + (entry.day - 1) * DAY_MS;
+    const adDate = new Date(adTime);
+    const dayName = AD_DAYS[adDate.getUTCDay()];
+    const adMonth = AD_MONTHS[adDate.getUTCMonth()];
 
-    const today = this.dateEngine.adToBs(new Date());
+    const today = this.dateEngine.adToBs(todayAdTime());
     const isToday =
       meta.year === today.bsYear &&
       meta.monthIndex === today.bsMonthIndex &&
       entry.day === today.bsDay;
 
     let rows = '';
-    entry.events.forEach(evt => {
+    entry.events.forEach((evt) => {
       const badge = evt.isPublicHoliday
         ? '<span class="text-[11px] font-semibold text-iosred-500 bg-iosred-500/10 px-2 py-0.5 rounded-full shrink-0 border border-iosred-500/20">Holiday</span>'
         : '';
@@ -183,13 +201,13 @@ class UpcomingEventsEngine {
       `;
     });
 
-    $el.html(`
+    el.innerHTML = `
       <div class="h-[20px] flex items-center gap-2 px-1 overflow-hidden">
         <span class="text-[11px] font-semibold ${isToday ? 'text-iosred-500' : 'text-iosgray-400'} uppercase tracking-wider whitespace-nowrap">${dayName}, ${entry.day} ${monthName} ${meta.year}</span>
         <span class="text-[10px] text-iosgray-400 whitespace-nowrap">${adMonth} ${adDate.getUTCDate()}, ${adDate.getUTCFullYear()}</span>
       </div>
       ${rows}
-    `);
+    `;
   }
 
   reset() {
@@ -199,10 +217,11 @@ class UpcomingEventsEngine {
     }
 
     if (this.entries.length > 0) {
+      this._positionEndNote();
       const index = this._findTodayIndex();
-      this.$viewport[0].scrollTop = Math.max(0, this.positions[index].top - this.NOTE_H - 8);
+      this.viewport.scrollTop = Math.max(0, this.positions[index].top - this.NOTE_H - 8);
     } else {
-      this.$viewport[0].scrollTop = 0;
+      this.viewport.scrollTop = 0;
     }
 
     this.render();

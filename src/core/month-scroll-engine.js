@@ -1,7 +1,10 @@
-class VirtualScrollEngine {
-  constructor($viewport, $track, dateEngine, eventProvider, onHeaderUpdate, onDaySelect, initialMonthIndex) {
-    this.$viewport = $viewport;
-    this.$track = $track;
+import { MONTH_NAMES_BS } from '../data/calendar-constants.js';
+import { todayAdTime } from './date-engine.js';
+
+export class MonthScrollEngine {
+  constructor(viewport, track, dateEngine, eventProvider, onHeaderUpdate, onDaySelect, initialMonthIndex) {
+    this.viewport = viewport;
+    this.track = track;
     this.dateEngine = dateEngine;
     this.eventProvider = eventProvider;
     this.onHeaderUpdate = onHeaderUpdate;
@@ -22,7 +25,7 @@ class VirtualScrollEngine {
     this._bindDayClick();
 
     if (initialMonthIndex !== undefined) {
-      this.$viewport[0].scrollTop = this.monthPositions[initialMonthIndex]?.top || 0;
+      viewport.scrollTop = this.monthPositions[initialMonthIndex]?.top || 0;
     }
 
     this._bindScrollEvent();
@@ -47,36 +50,37 @@ class VirtualScrollEngine {
       currentY += height + this.MONTH_MARGIN_TOP;
     }
 
-    this.$track.css('height', `${currentY}px`);
+    this.track.style.height = `${currentY}px`;
   }
 
   _createDOMPool() {
-    this.$track.empty();
+    this.track.innerHTML = '';
     this.poolNodes = [];
 
     for (let i = 0; i < this.POOL_SIZE; i++) {
-      const $card = $(`
-        <div class="month-card-node absolute left-0 right-0 mx-auto w-full max-w-full bg-black overflow-hidden px-4">
-          <div class="month-card-header flex items-center justify-start py-4 h-[44px]">
-            <span class="bs-title font-medium text-[28px] text-white"></span>
-          </div>
-          <div class="days-grid grid grid-cols-7 gap-0"></div>
+      const card = document.createElement('div');
+      card.className = 'month-card-node absolute left-0 right-0 mx-auto w-full max-w-full bg-black overflow-hidden px-4';
+      card.innerHTML = `
+        <div class="month-card-header flex items-center justify-start py-4 h-[44px]">
+          <span class="bs-title font-medium text-[28px] text-white"></span>
         </div>
-      `);
+        <div class="days-grid grid grid-cols-7 gap-0"></div>
+      `;
 
-      this.$track.append($card);
+      this.track.appendChild(card);
       this.poolNodes.push({
-        $el: $card,
+        el: card,
         assignedGlobalIndex: -1
       });
     }
   }
 
   _bindDayClick() {
-    this.$track.on('click', '.day-cell', (e) => {
-      const $target = $(e.currentTarget);
-      const monthIndex = parseInt($target.data('month-index'), 10);
-      const day = parseInt($target.data('day'), 10);
+    this.track.addEventListener('click', (e) => {
+      const target = e.target.closest('.day-cell');
+      if (!target) return;
+      const monthIndex = parseInt(target.dataset.monthIndex, 10);
+      const day = parseInt(target.dataset.day, 10);
       if (!isNaN(monthIndex) && !isNaN(day) && this.onDaySelect) {
         this.onDaySelect(monthIndex, day);
       }
@@ -84,7 +88,7 @@ class VirtualScrollEngine {
   }
 
   _bindScrollEvent() {
-    this.$viewport.on('scroll', () => {
+    this.viewport.addEventListener('scroll', () => {
       if (this.isTicking) return;
       this.isTicking = true;
       requestAnimationFrame(() => {
@@ -95,7 +99,7 @@ class VirtualScrollEngine {
   }
 
   render() {
-    const scrollTop = this.$viewport.scrollTop();
+    const scrollTop = this.viewport.scrollTop;
     let low = 0;
     let high = this.monthPositions.length - 1;
     let topVisibleIndex = 0;
@@ -119,34 +123,34 @@ class VirtualScrollEngine {
       const node = this.poolNodes[i % this.POOL_SIZE];
 
       if (node.assignedGlobalIndex !== i) {
-        this._populateMonthCard(node.$el, i);
+        this._populateMonthCard(node.el, i);
         node.assignedGlobalIndex = i;
       }
 
-      node.$el.css('transform', `translate3d(0, ${this.monthPositions[i].top}px, 0)`);
+      node.el.style.transform = `translate3d(0, ${this.monthPositions[i].top}px, 0)`;
     }
   }
 
-  _populateMonthCard($card, globalMonthIndex) {
+  _populateMonthCard(card, globalMonthIndex) {
     const meta = this.dateEngine.monthMeta[globalMonthIndex];
-    const monthName = CalendarDataStore.MONTH_NAMES_BS[meta.monthIndex];
+    const monthName = MONTH_NAMES_BS[meta.monthIndex];
 
-    $card.find('.bs-title').text(monthName);
+    card.querySelector('.bs-title').textContent = monthName;
 
-    const $grid = $card.find('.days-grid');
-    $grid.empty();
+    const grid = card.querySelector('.days-grid');
+    let html = '';
 
     for (let i = 0; i < meta.startDayOfWeek; i++) {
-      $grid.append('<div class="h-11"></div>');
+      html += '<div class="h-11"></div>';
     }
 
-    const today = this.dateEngine.adToBs(new Date());
+    const today = this.dateEngine.adToBs(todayAdTime());
 
     for (let day = 1; day <= meta.totalDays; day++) {
-      const currentAdDate = new Date(meta.startAdDate.getTime() + (day - 1) * 86400000);
-      const { isHoliday } = this.eventProvider.getDayMetaData(currentAdDate);
+      const currentAdTime = meta.startAdTime + (day - 1) * 86400000;
+      const { isHoliday } = this.eventProvider.getDayMetaData(currentAdTime);
       const events = this.eventProvider.getEvents(meta.year, meta.monthIndex, day);
-      const hasEvents = events.some(evt => evt.isPublicHoliday);
+      const hasEvents = events.some((evt) => evt.isPublicHoliday);
 
       const isToday =
         meta.year === today.bsYear &&
@@ -168,20 +172,22 @@ class VirtualScrollEngine {
         ? `<div class="absolute bottom-1 w-1 h-1 rounded-full ${isToday ? 'bg-white' : 'bg-iosred-500'}"></div>`
         : '';
 
-      $grid.append(`
+      html += `
         <div class="day-cell relative h-11 flex flex-col items-center justify-center select-none cursor-pointer rounded-full active:bg-iosgray-800/40" data-month-index="${globalMonthIndex}" data-day="${day}">
           ${circle}
           <span class="text-[17px] z-10 leading-none ${numberClass}">${day}</span>
           ${eventDot}
         </div>
-      `);
+      `;
     }
+
+    grid.innerHTML = html;
   }
 
   scrollToMonth(globalMonthIndex) {
     const position = this.monthPositions[globalMonthIndex];
     if (!position) return;
-    this.$viewport[0].scrollTop = position.top;
+    this.viewport.scrollTop = position.top;
     this.render();
   }
 }

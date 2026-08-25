@@ -1,16 +1,18 @@
-class DateEngine {
+import { MITI } from '../data/miti.js';
+import { ANCHOR } from '../data/calendar-constants.js';
+
+const DAY_MS = 86400000;
+
+export class DateEngine {
   constructor() {
-    this.miti = CalendarDataStore.getMitiData();
     this.startYear = 1992;
     this.endYear = 2100;
     this.monthStartOffsets = [];
     this.monthMeta = [];
-
     this._initializeOffsets();
   }
 
   _initializeOffsets() {
-    const { ANCHOR } = CalendarDataStore;
     const anchorIndex = (ANCHOR.bsYear - this.startYear) * 12 + ANCHOR.bsMonthIndex;
     const totalMonths = (this.endYear - this.startYear + 1) * 12;
 
@@ -21,23 +23,23 @@ class DateEngine {
     for (let i = anchorIndex; i < totalMonths - 1; i++) {
       const year = this.startYear + Math.floor(i / 12);
       const month = i % 12;
-      this.monthStartOffsets[i + 1] = this.monthStartOffsets[i] + (this.miti[year] ? this.miti[year][month] : 30);
+      this.monthStartOffsets[i + 1] = this.monthStartOffsets[i] + (MITI[year] ? MITI[year][month] : 30);
     }
 
     for (let i = anchorIndex - 1; i >= 0; i--) {
       const year = this.startYear + Math.floor(i / 12);
       const month = i % 12;
-      this.monthStartOffsets[i] = this.monthStartOffsets[i + 1] - (this.miti[year] ? this.miti[year][month] : 30);
+      this.monthStartOffsets[i] = this.monthStartOffsets[i + 1] - (MITI[year] ? MITI[year][month] : 30);
     }
 
     for (let i = 0; i < totalMonths; i++) {
       const year = this.startYear + Math.floor(i / 12);
       const monthIndex = i % 12;
-      const totalDays = this.miti[year] ? this.miti[year][monthIndex] : 30;
+      const totalDays = MITI[year] ? MITI[year][monthIndex] : 30;
       const offset = this.monthStartOffsets[i];
 
       const startDayOfWeek = ((6 + (offset % 7)) % 7 + 7) % 7;
-      const startAdDate = new Date(ANCHOR.adDate.getTime() + offset * 86400000);
+      const startAdTime = ANCHOR.adTime + offset * DAY_MS;
 
       this.monthMeta[i] = {
         year,
@@ -45,14 +47,13 @@ class DateEngine {
         totalDays,
         startDayOfWeek,
         numRows: Math.ceil((startDayOfWeek + totalDays) / 7),
-        startAdDate
+        startAdTime
       };
     }
   }
 
-  adToBs(adDate) {
-    const utcAd = Date.UTC(adDate.getUTCFullYear ? adDate.getUTCFullYear() : adDate.getFullYear(), adDate.getUTCMonth ? adDate.getUTCMonth() : adDate.getMonth(), adDate.getUTCDate ? adDate.getUTCDate() : adDate.getDate());
-    const diffDays = Math.floor((utcAd - CalendarDataStore.ANCHOR.adDate.getTime()) / 86400000);
+  adToBs(adTime) {
+    const diffDays = Math.floor((adTime - ANCHOR.adTime) / DAY_MS);
 
     let low = 0;
     let high = this.monthStartOffsets.length - 1;
@@ -83,6 +84,11 @@ class DateEngine {
     const globalMonthIndex = (bsYear - this.startYear) * 12 + bsMonthIndex;
     if (globalMonthIndex < 0 || globalMonthIndex >= this.monthStartOffsets.length) return null;
     const offset = this.monthStartOffsets[globalMonthIndex] + (bsDay - 1);
-    return new Date(CalendarDataStore.ANCHOR.adDate.getTime() + offset * 86400000);
+    return ANCHOR.adTime + offset * DAY_MS;
   }
+}
+
+export function todayAdTime() {
+  const now = new Date();
+  return Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
 }
