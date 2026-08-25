@@ -41,10 +41,10 @@ const hideModal = (overlay, modal) => {
 const holidayBadge = '<span class="text-[11px] font-semibold text-iosred-500 bg-iosred-500/10 px-2 py-0.5 rounded-full shrink-0 border border-iosred-500/20">Holiday</span>';
 
 const eventRowHtml = (title, isPublicHoliday) => `
-  <div class="flex items-center justify-between gap-3 bg-white/5 px-3 py-2.5 rounded-xl border border-white/5">
+  <div class="flex items-center justify-between gap-3 bg-white/5 px-3 py-2.5 rounded-xl border border-white/5 select-text">
     <div class="flex items-center gap-2.5 min-w-0">
       <span class="w-1.5 h-1.5 rounded-full ${isPublicHoliday ? 'bg-iosred-500' : 'bg-white/70'} shrink-0"></span>
-      <span class="text-sm font-medium text-white truncate">${title}</span>
+      <span class="text-sm font-medium text-white break-words min-w-0">${title}</span>
     </div>
     ${isPublicHoliday ? holidayBadge : ''}
   </div>
