@@ -90,5 +90,5 @@ export class DateEngine {
 
 export function todayAdTime() {
   const now = new Date();
-  return Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  return Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
 }

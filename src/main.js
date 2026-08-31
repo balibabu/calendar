@@ -271,7 +271,6 @@ const updateHeader = (meta) => {
 };
 
 const today = dateEngine.adToBs(todayAdTime());
-
 const monthScrollEngine = new MonthScrollEngine(
   monthViewport,
   monthTrack,
@@ -329,5 +328,39 @@ EventStore.subscribe(() => {
     upcomingEngine.refresh();
   }
 });
+
+let lastSeenDayKey = `${today.bsYear}-${today.bsMonthIndex}-${today.bsDay}`;
+
+const handleDayRollover = () => {
+  const nowBs = dateEngine.adToBs(todayAdTime());
+  const nowKey = `${nowBs.bsYear}-${nowBs.bsMonthIndex}-${nowBs.bsDay}`;
+  if (nowKey === lastSeenDayKey) {
+    return;
+  }
+  lastSeenDayKey = nowKey;
+
+  monthScrollEngine.refresh();
+  yearScrollEngine.refresh();
+  if (!upcomingOverlay.classList.contains('hidden')) {
+    upcomingEngine.refresh();
+  }
+};
+
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) handleDayRollover();
+});
+
+window.addEventListener('focus', handleDayRollover);
+
+const scheduleMidnightTimer = () => {
+  const now = new Date();
+  const nextMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 5);
+  setTimeout(() => {
+    handleDayRollover();
+    scheduleMidnightTimer();
+  }, nextMidnight - now);
+};
+
+scheduleMidnightTimer();
 
 requestAnimationFrame(() => requestAnimationFrame(() => EventLoader.start(today.bsYear)));

@@ -179,4 +179,11 @@ export class YearScrollEngine {
     this.viewport.scrollTop = position.top;
     this.render();
   }
+
+  refresh() {
+    for (const node of this.poolNodes) {
+      node.assignedYearIndex = -1;
+    }
+    this.render();
+  }
 }
