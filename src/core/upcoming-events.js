@@ -1,4 +1,4 @@
-import { BS_EVENTS } from '../data/events.js';
+import { EventStore } from './event-store.js';
 import { MONTH_NAMES_BS, AD_MONTHS, AD_DAYS } from '../data/calendar-constants.js';
 import { todayAdTime } from './date-engine.js';
 
@@ -42,11 +42,10 @@ export class UpcomingEventsEngine {
 
     for (let gmi = 0; gmi < monthMeta.length; gmi++) {
       const meta = monthMeta[gmi];
-      const prefix = `${meta.year}-${String(meta.monthIndex + 1).padStart(2, '0')}-`;
 
       for (let day = 1; day <= meta.totalDays; day++) {
-        const events = BS_EVENTS[prefix + String(day).padStart(2, '0')];
-        if (events && events.length > 0) {
+        const events = EventStore.getEvents(meta.year, meta.monthIndex, day);
+        if (events.length > 0) {
           entries.push({ gmi, day, events });
         }
       }
@@ -136,10 +135,7 @@ export class UpcomingEventsEngine {
     return Math.max(0, result);
   }
 
-  render() {
-    if (!this.entries || this.entries.length === 0) return;
-
-    const scrollTop = this.viewport.scrollTop;
+  _findTopVisibleIndex(scrollTop) {
     let low = 0;
     let high = this.positions.length - 1;
     let topVisibleIndex = 0;
@@ -153,6 +149,14 @@ export class UpcomingEventsEngine {
         low = mid + 1;
       }
     }
+
+    return topVisibleIndex;
+  }
+
+  render() {
+    if (!this.entries || this.entries.length === 0) return;
+
+    const topVisibleIndex = this._findTopVisibleIndex(this.viewport.scrollTop);
 
     const startIndex = Math.max(0, topVisibleIndex - 1);
     const endIndex = Math.min(this.positions.length - 1, startIndex + this.POOL_SIZE - 1);
@@ -211,10 +215,8 @@ export class UpcomingEventsEngine {
   }
 
   reset() {
-    if (!this.entries) {
-      this._buildEntries();
-      this._calculateLayoutPositions();
-    }
+    this._buildEntries();
+    this._calculateLayoutPositions();
 
     if (this.entries.length > 0) {
       this._positionEndNote();
@@ -222,6 +224,47 @@ export class UpcomingEventsEngine {
       this.viewport.scrollTop = Math.max(0, this.positions[index].top - this.NOTE_H - 8);
     } else {
       this.viewport.scrollTop = 0;
+    }
+
+    for (const node of this.poolNodes) {
+      node.assignedIndex = -1;
+    }
+
+    this.render();
+  }
+
+  refresh() {
+    if (!this.entries) return;
+
+    const scrollTop = this.viewport.scrollTop;
+    let anchorKey = null;
+    let anchorOffset = 0;
+
+    if (this.entries.length > 0) {
+      const index = this._findTopVisibleIndex(scrollTop);
+      anchorKey = `${this.entries[index].gmi}-${this.entries[index].day}`;
+      anchorOffset = scrollTop - this.positions[index].top;
+    }
+
+    this._buildEntries();
+    this._calculateLayoutPositions();
+    this._positionEndNote();
+
+    if (anchorKey !== null && this.entries.length > 0) {
+      let newIndex = -1;
+      for (let i = 0; i < this.entries.length; i++) {
+        if (`${this.entries[i].gmi}-${this.entries[i].day}` === anchorKey) {
+          newIndex = i;
+          break;
+        }
+      }
+      this.viewport.scrollTop = newIndex >= 0 ? Math.max(0, this.positions[newIndex].top + anchorOffset) : scrollTop;
+    } else {
+      this.viewport.scrollTop = scrollTop;
+    }
+
+    for (const node of this.poolNodes) {
+      node.assignedIndex = -1;
     }
 
     this.render();

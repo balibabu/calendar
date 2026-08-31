@@ -190,4 +190,11 @@ export class MonthScrollEngine {
     this.viewport.scrollTop = position.top;
     this.render();
   }
+
+  refresh() {
+    for (const node of this.poolNodes) {
+      node.assignedGlobalIndex = -1;
+    }
+    this.render();
+  }
 }

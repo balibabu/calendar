@@ -4,6 +4,8 @@ import { MonthScrollEngine } from './core/month-scroll-engine.js';
 import { YearScrollEngine } from './core/year-scroll-engine.js';
 import { UpcomingEventsEngine } from './core/upcoming-events.js';
 import { EventProvider, MONTH_NAMES_BS, AD_MONTHS, AD_DAYS, searchEvents } from './data/calendar-constants.js';
+import { EventStore } from './core/event-store.js';
+import { EventLoader } from './core/event-loader.js';
 import { MITI } from './data/miti.js';
 
 const $ = (id) => document.getElementById(id);
@@ -320,3 +322,12 @@ $('btn-today').addEventListener('click', () => {
     switchToMonthView(curToday.globalMonthIndex);
   }
 });
+
+EventStore.subscribe(() => {
+  monthScrollEngine.refresh();
+  if (!upcomingOverlay.classList.contains('hidden')) {
+    upcomingEngine.refresh();
+  }
+});
+
+requestAnimationFrame(() => requestAnimationFrame(() => EventLoader.start(today.bsYear)));

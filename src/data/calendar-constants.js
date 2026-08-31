@@ -1,4 +1,4 @@
-import { BS_EVENTS } from './events.js';
+import { EventStore } from '../core/event-store.js';
 
 export const ANCHOR = {
   bsYear: 2056,
@@ -38,26 +38,10 @@ export class EventProvider {
   }
 
   getEvents(year, monthIndex, day) {
-    const key = `${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    return BS_EVENTS[key] || [];
+    return EventStore.getEvents(year, monthIndex, day);
   }
 }
 
 export function searchEvents(years, query) {
-  const q = query.trim().toLowerCase();
-  if (!q) return [];
-
-  const matches = [];
-  for (const key of Object.keys(BS_EVENTS)) {
-    const [year, month, day] = key.split('-').map(Number);
-    if (!years.includes(year)) continue;
-    for (const evt of BS_EVENTS[key]) {
-      if (evt.title.toLowerCase().includes(q)) {
-        matches.push({ year, monthIndex: month - 1, day, evt });
-      }
-    }
-  }
-
-  matches.sort((a, b) => a.year - b.year || a.monthIndex - b.monthIndex || a.day - b.day);
-  return matches;
+  return EventStore.searchEvents(years, query);
 }

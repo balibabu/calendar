@@ -1,4 +1,4 @@
-export const BS_EVENTS = {
+{
   "2083-01-01": [
     {
       "title": "नववर्ष २०८३ आरम्भ, भक्तपुर विश्वध्वजपातन (विस्काजात्रा)",
@@ -1156,4 +1156,5 @@ export const BS_EVENTS = {
       "title": "भक्तपुर विश्वध्वजोत्थान",
       "isPublicHoliday": false
     }
-  ]};
+  ]
+}
