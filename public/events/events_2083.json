@@ -444,13 +444,17 @@
     },
     {
       "title": "रसुवा बाढीमा ज्यान गुमाएकाको सम्मानमा शोक बिदा",
-      "isPublicHoliday": true
+      "isPublicHoliday": false
     }
   ],
   "2083-05-23": [
     {
       "title": "स्वयम्भूको छायाँ दर्शन, जेनजी सहिद दिवस",
       "isPublicHoliday": false
+    },
+    {
+      "title": "Gen Z Martyrs’ Day",
+      "isPublicHoliday": true
     }
   ],
   "2083-05-24": [
