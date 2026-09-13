@@ -1,24 +1,30 @@
 import { EventStore } from './event-store.js';
 
-const MAX_CONSECUTIVE_MISSES = 3;
-const MIN_YEAR = 1992;
-const MAX_YEAR = 2100;
-
-const buildUrl = (year) => {
+const buildUrl = (fileName) => {
   const base = import.meta.env.BASE_URL || '/';
-  return `${base}events/events_${year}.json`.replace(/([^:]\/)\/+/g, '$1');
+  return `${base}events/${fileName}`.replace(/([^:]\/)\/+/g, '$1');
 };
 
-const fetchYear = async (year) => {
+const yearOf = (fileName) => {
+  const match = fileName.match(/(\d{4})/);
+  return match ? Number(match[1]) : null;
+};
+
+const loadFile = async (fileName) => {
+  const year = yearOf(fileName);
+  if (!year) {
+    console.warn(`[EventLoader] skipping "${fileName}": no year in filename`);
+    return;
+  }
+
   try {
-    const response = await fetch(buildUrl(year));
+    const response = await fetch(buildUrl(fileName));
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
     EventStore.registerYear(year, data);
-    return true;
-  } catch {
+  } catch (err) {
+    console.warn(`[EventLoader] failed to load "${fileName}":`, err.message);
     EventStore.markYearFailed(year);
-    return false;
   }
 };
 
@@ -28,37 +34,19 @@ export const EventLoader = {
     this._started = true;
 
     return (async () => {
-      await fetchYear(pivotYear);
-
-      let up = pivotYear + 1;
-      let down = pivotYear - 1;
-      let missUp = 0;
-      let missDown = 0;
-
-      while (missUp < MAX_CONSECUTIVE_MISSES || missDown < MAX_CONSECUTIVE_MISSES) {
-        const targets = [];
-
-        if (missUp < MAX_CONSECUTIVE_MISSES && up <= MAX_YEAR) {
-          targets.push(up);
-          up++;
-        }
-
-        if (missDown < MAX_CONSECUTIVE_MISSES && down >= MIN_YEAR) {
-          targets.push(down);
-          down--;
-        }
-
-        if (targets.length === 0) break;
-
-        for (const year of targets) {
-          const success = await fetchYear(year);
-          if (year > pivotYear) {
-            missUp = success ? 0 : missUp + 1;
-          } else {
-            missDown = success ? 0 : missDown + 1;
-          }
-        }
+      let files;
+      try {
+        const response = await fetch(buildUrl('manifest.json'));
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const manifest = await response.json();
+        files = manifest.files || [];
+      } catch (err) {
+        console.warn('[EventLoader] failed to load manifest.json:', err.message);
+        return;
       }
+
+      await loadFile(files.find((f) => yearOf(f) === pivotYear));
+      await Promise.all(files.filter((f) => yearOf(f) !== pivotYear).map(loadFile));
     })();
   }
 };
