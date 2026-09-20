@@ -3,5 +3,8 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   base: '/calendar/',
-  plugins: [tailwindcss()]
+  plugins: [tailwindcss()],
+  preview: {
+    allowedHosts: ['tester.balibabu.com.np']
+  }
 });
