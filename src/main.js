@@ -162,6 +162,41 @@ upcomingOverlay.addEventListener('click', (e) => {
   if (e.target === upcomingOverlay) closeUpcomingModal();
 });
 
+const alertOverlay = $('alert-modal-overlay');
+const alertModal = $('alert-modal');
+const alertDate = $('alert-date');
+const alertEventsList = $('alert-events-list');
+const ALERT_DISMISSED_KEY = 'calendar-alert-dismissed';
+
+const todayAlertDayKey = (nowBs) => `${nowBs.bsYear}-${nowBs.bsMonthIndex}-${nowBs.bsDay}`;
+
+const closeAlertModal = () => {
+  hideModal(alertOverlay, alertModal);
+  localStorage.setItem(ALERT_DISMISSED_KEY, todayAlertDayKey(dateEngine.adToBs(todayAdTime())));
+};
+
+$('alert-modal-close').addEventListener('click', closeAlertModal);
+alertOverlay.addEventListener('click', (e) => {
+  if (e.target === alertOverlay) closeAlertModal();
+});
+
+const maybeShowTodayAlert = () => {
+  const nowBs = dateEngine.adToBs(todayAdTime());
+  if (localStorage.getItem(ALERT_DISMISSED_KEY) === todayAlertDayKey(nowBs)) return;
+
+  const events = eventProvider.getEvents(nowBs.bsYear, nowBs.bsMonthIndex, nowBs.bsDay);
+  if (events.length === 0) return;
+
+  const meta = dateEngine.monthMeta[nowBs.globalMonthIndex];
+  const adTime = meta.startAdTime + (nowBs.bsDay - 1) * 86400000;
+  const adDate = new Date(adTime);
+
+  alertDate.textContent = `${nowBs.bsDay} ${MONTH_NAMES_BS[nowBs.bsMonthIndex]} ${nowBs.bsYear} · ${AD_DAYS[adDate.getUTCDay()]}, ${AD_MONTHS[adDate.getUTCMonth()]} ${adDate.getUTCDate()}, ${adDate.getUTCFullYear()}`;
+  alertEventsList.innerHTML = events.map((evt) => eventRowHtml(evt.title, evt.isPublicHoliday)).join('');
+
+  showModal(alertOverlay, alertModal);
+};
+
 const convOverlay = $('converter-modal-overlay');
 const convModal = $('converter-modal');
 
@@ -363,4 +398,4 @@ const scheduleMidnightTimer = () => {
 
 scheduleMidnightTimer();
 
-requestAnimationFrame(() => requestAnimationFrame(() => EventLoader.start(today.bsYear)));
+requestAnimationFrame(() => requestAnimationFrame(() => EventLoader.start(today.bsYear).then(maybeShowTodayAlert)));
