@@ -150,7 +150,8 @@ export class MonthScrollEngine {
       const currentAdTime = meta.startAdTime + (day - 1) * 86400000;
       const { isHoliday } = this.eventProvider.getDayMetaData(currentAdTime);
       const events = this.eventProvider.getEvents(meta.year, meta.monthIndex, day);
-      const hasEvents = events.some((evt) => evt.isPublicHoliday);
+      const hasHoliday = events.some((evt) => evt.isPublicHoliday);
+      const hasUserEvent = events.some((evt) => evt.isUser);
 
       const isToday =
         meta.year === today.bsYear &&
@@ -168,8 +169,9 @@ export class MonthScrollEngine {
         ? '<div class="absolute inset-0 m-auto aspect-square h-[30px] rounded-full bg-iosred-500 z-0"></div>'
         : '';
 
-      const eventDot = hasEvents
-        ? `<div class="absolute bottom-1 w-1 h-1 rounded-full ${isToday ? 'bg-white' : 'bg-iosred-500'}"></div>`
+      const dotColor = hasUserEvent ? 'bg-iosblue-500' : 'bg-iosred-500';
+      const eventDot = hasHoliday || hasUserEvent
+        ? `<div class="absolute bottom-1 w-1 h-1 rounded-full ${isToday ? 'bg-white' : dotColor}"></div>`
         : '';
 
       html += `

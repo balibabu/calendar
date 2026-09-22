@@ -4,6 +4,9 @@ import { todayAdTime } from './date-engine.js';
 
 const DAY_MS = 86400000;
 
+const escapeHtml = (text) =>
+  text.replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+
 export class UpcomingEventsEngine {
   constructor(viewport, track, dateEngine, eventProvider) {
     this.viewport = viewport;
@@ -193,12 +196,13 @@ export class UpcomingEventsEngine {
       const badge = evt.isPublicHoliday
         ? '<span class="text-[11px] font-semibold text-iosred-500 bg-iosred-500/10 px-2 py-0.5 rounded-full shrink-0 border border-iosred-500/20">Holiday</span>'
         : '';
+      const dotColor = evt.isPublicHoliday ? 'bg-iosred-500' : evt.isUser ? 'bg-iosblue-500' : 'bg-white/70';
 
       rows += `
         <div class="h-[44px] flex items-center justify-between gap-3 bg-white/5 px-3 rounded-xl border border-white/5">
           <div class="flex items-center gap-2.5 min-w-0">
-            <span class="w-1.5 h-1.5 rounded-full ${evt.isPublicHoliday ? 'bg-iosred-500' : 'bg-white/70'} shrink-0"></span>
-            <span class="text-sm font-medium text-white truncate">${evt.title}</span>
+            <span class="w-1.5 h-1.5 rounded-full ${dotColor} shrink-0"></span>
+            <span class="text-sm font-medium text-white truncate">${evt.isUser ? escapeHtml(evt.title) : evt.title}</span>
           </div>
           ${badge}
         </div>

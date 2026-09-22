@@ -52,11 +52,40 @@ const eventRowHtml = (title, isPublicHoliday) => `
   </div>
 `;
 
+const escapeHtml = (text) =>
+  text.replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+
+const userEventRowHtml = (title, id) => `
+  <div data-user-event-id="${id}" class="flex items-center gap-2.5 bg-white/5 px-3 py-2.5 rounded-xl border border-white/5 cursor-pointer hover:bg-white/10 active:scale-[0.98] transition-all select-text">
+    <span class="w-1.5 h-1.5 rounded-full bg-iosblue-500 shrink-0"></span>
+    <span class="text-sm font-medium text-white break-words min-w-0">${escapeHtml(title)}</span>
+  </div>
+`;
+
+const addEventRowHtml = `
+  <button id="modal-add-trigger" class="flex items-center gap-2.5 bg-white/5 border border-dashed border-white/15 px-3 py-2.5 rounded-xl hover:bg-white/10 hover:border-white/25 active:scale-[0.98] transition-all cursor-pointer w-full">
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-iosgray-400 shrink-0"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+    <span class="text-sm font-medium text-iosgray-400">Add event</span>
+  </button>
+`;
+
+const addEventInputHtml = `
+  <div class="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 focus-within:border-iosred-500/50 transition-colors">
+    <input id="modal-add-input" type="text" autocomplete="off" placeholder="Event name" maxlength="60" class="w-full bg-transparent text-sm text-white placeholder-iosgray-400 outline-none" />
+    <button id="modal-add-confirm" class="w-7 h-7 rounded-full bg-iosred-500 hover:bg-iosred-600 active:scale-95 flex items-center justify-center text-white transition-all cursor-pointer shrink-0">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+    </button>
+  </div>
+`;
+
 const overlay = $('event-modal-overlay');
 const modal = $('event-modal');
 const modalBsDate = $('modal-bs-date');
 const modalAdDate = $('modal-ad-date');
 const modalEventsList = $('modal-events-list');
+
+let modalContext = null;
+let isAddingEvent = false;
 
 const openEventModal = (globalMonthIndex, day) => {
   const meta = dateEngine.monthMeta[globalMonthIndex];
@@ -70,18 +99,93 @@ const openEventModal = (globalMonthIndex, day) => {
   modalBsDate.textContent = `${day} ${monthName} ${meta.year}`;
   modalAdDate.textContent = `${dayName}, ${adMonth} ${adDate.getUTCDate()}, ${adDate.getUTCFullYear()}`;
 
-  const events = eventProvider.getEvents(meta.year, meta.monthIndex, day);
-
-  if (events.length === 0) {
-    modalEventsList.innerHTML = '<div class="text-iosgray-400 text-sm py-2">No events for this day.</div>';
-  } else {
-    modalEventsList.innerHTML = events
-      .map((evt) => eventRowHtml(evt.title, evt.isPublicHoliday))
-      .join('');
-  }
+  modalContext = { globalMonthIndex, day };
+  isAddingEvent = false;
+  renderModalEvents();
 
   showModal(overlay, modal);
 };
+
+const renderModalEvents = () => {
+  const meta = dateEngine.monthMeta[modalContext.globalMonthIndex];
+  const events = eventProvider.getEvents(meta.year, meta.monthIndex, modalContext.day);
+
+  let html = '';
+  if (events.length === 0) {
+    html += '<div class="text-iosgray-400 text-sm py-2">No events for this day.</div>';
+  }
+  html += events.filter((evt) => !evt.isUser).map((evt) => eventRowHtml(evt.title, evt.isPublicHoliday)).join('');
+  html += events.filter((evt) => evt.isUser).map((evt) => userEventRowHtml(evt.title, evt.id)).join('');
+  html += isAddingEvent ? addEventInputHtml : addEventRowHtml;
+  modalEventsList.innerHTML = html;
+
+  if (isAddingEvent) {
+    const input = $('modal-add-input');
+    input.focus();
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') confirmAddEvent();
+      if (e.key === 'Escape') cancelAddEvent();
+    });
+    $('modal-add-confirm').addEventListener('click', confirmAddEvent);
+  } else {
+    $('modal-add-trigger').addEventListener('click', startAddEvent);
+  }
+};
+
+const startAddEvent = () => {
+  isAddingEvent = true;
+  renderModalEvents();
+};
+
+const cancelAddEvent = () => {
+  isAddingEvent = false;
+  renderModalEvents();
+};
+
+const confirmAddEvent = () => {
+  const input = $('modal-add-input');
+  const title = input.value.trim();
+  if (!title) {
+    input.focus();
+    return;
+  }
+  const meta = dateEngine.monthMeta[modalContext.globalMonthIndex];
+  EventStore.addUserEvent(meta.year, meta.monthIndex, modalContext.day, title);
+  isAddingEvent = false;
+  renderModalEvents();
+};
+
+const confirmOverlay = $('confirm-modal-overlay');
+const confirmModal = $('confirm-modal');
+const confirmMessage = $('confirm-message');
+let pendingDeleteId = null;
+
+const hideConfirmModal = () => hideModal(confirmOverlay, confirmModal);
+
+$('confirm-accept').addEventListener('click', () => {
+  if (!modalContext || !pendingDeleteId) return;
+  const meta = dateEngine.monthMeta[modalContext.globalMonthIndex];
+  EventStore.removeUserEvent(meta.year, meta.monthIndex, modalContext.day, pendingDeleteId);
+  pendingDeleteId = null;
+  hideConfirmModal();
+  renderModalEvents();
+});
+
+$('confirm-cancel').addEventListener('click', hideConfirmModal);
+confirmOverlay.addEventListener('click', (e) => {
+  if (e.target === confirmOverlay) hideConfirmModal();
+});
+
+modalEventsList.addEventListener('click', (e) => {
+  const row = e.target.closest('[data-user-event-id]');
+  if (!row || !modalContext) return;
+  const meta = dateEngine.monthMeta[modalContext.globalMonthIndex];
+  const evt = eventProvider.getEvents(meta.year, meta.monthIndex, modalContext.day).find((ev) => ev.id === row.dataset.userEventId);
+  if (!evt) return;
+  pendingDeleteId = evt.id;
+  confirmMessage.textContent = `Delete "${evt.title}"?`;
+  showModal(confirmOverlay, confirmModal);
+});
 
 const ALERT_DISMISSED_KEY = 'calendar-alert-dismissed';
 let alertArmed = false;
@@ -125,7 +229,7 @@ const renderSearchResults = (query) => {
     .map(({ year, monthIndex, day, evt }) => `
       <div class="flex items-center justify-between gap-3 bg-white/5 px-3 py-2.5 rounded-xl border border-white/5">
         <div class="flex flex-col gap-0.5 min-w-0">
-          <span class="text-sm font-medium text-white truncate">${evt.title}</span>
+          <span class="text-sm font-medium text-white truncate">${evt.isUser ? escapeHtml(evt.title) : evt.title}</span>
           <span class="text-xs text-iosgray-400">${day} ${MONTH_NAMES_BS[monthIndex]} ${year}</span>
         </div>
         ${evt.isPublicHoliday ? holidayBadge : ''}
