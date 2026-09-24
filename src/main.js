@@ -6,6 +6,7 @@ import { UpcomingEventsEngine } from './core/upcoming-events.js';
 import { EventProvider, MONTH_NAMES_BS, AD_MONTHS, AD_DAYS, searchEvents } from './data/calendar-constants.js';
 import { EventStore } from './core/event-store.js';
 import { EventLoader } from './core/event-loader.js';
+import { Notify } from './core/notify.js';
 import { MITI } from './data/miti.js';
 
 const $ = (id) => document.getElementById(id);
@@ -281,10 +282,17 @@ upcomingOverlay.addEventListener('click', (e) => {
 
 const maybeShowTodayAlert = () => {
   const nowBs = dateEngine.adToBs(todayAdTime());
-  if (localStorage.getItem(ALERT_DISMISSED_KEY) === todayAlertDayKey(nowBs)) return;
-  if (eventProvider.getEvents(nowBs.bsYear, nowBs.bsMonthIndex, nowBs.bsDay).length === 0) return;
+  const dayKey = todayAlertDayKey(nowBs);
+  if (localStorage.getItem(ALERT_DISMISSED_KEY) === dayKey) return;
+  const events = eventProvider.getEvents(nowBs.bsYear, nowBs.bsMonthIndex, nowBs.bsDay);
+  if (events.length === 0) return;
   alertArmed = true;
   openEventModal(nowBs.globalMonthIndex, nowBs.bsDay);
+  Notify.ensurePermission().then(() => {
+    const titles = events.map((evt) => evt.title);
+    const body = titles.slice(0, 3).join('\n') + (titles.length > 3 ? `\n+${titles.length - 3} more` : '');
+    Notify.send(`Today's Events`, body, dayKey);
+  });
 };
 
 const convOverlay = $('converter-modal-overlay');
@@ -488,4 +496,5 @@ const scheduleMidnightTimer = () => {
 
 scheduleMidnightTimer();
 
+Notify.ensurePermission();
 requestAnimationFrame(() => requestAnimationFrame(() => EventLoader.start(today.bsYear).then(maybeShowTodayAlert)));
