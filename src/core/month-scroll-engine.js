@@ -25,11 +25,28 @@ export class MonthScrollEngine {
     this._bindDayClick();
 
     if (initialMonthIndex !== undefined) {
-      viewport.scrollTop = this.monthPositions[initialMonthIndex]?.top || 0;
+      this._initialTop = this.monthPositions[initialMonthIndex]?.top || 0;
+      viewport.scrollTop = this._initialTop;
+      this._guardInitialScroll();
     }
 
     this._bindScrollEvent();
     this.render();
+  }
+
+  _guardInitialScroll() {
+    const confirm = () => {
+      requestAnimationFrame(() => {
+        if (this.viewport.scrollTop === 0 && this._initialTop !== 0) {
+          this.viewport.scrollTop = this._initialTop;
+          this.render();
+        }
+      });
+    };
+    const cancel = () => window.removeEventListener('load', confirm);
+    ['wheel', 'pointerdown', 'keydown'].forEach((type) => window.addEventListener(type, cancel, { once: true }));
+    if (document.readyState === 'complete') confirm();
+    else window.addEventListener('load', confirm);
   }
 
   _calculateLayoutPositions() {

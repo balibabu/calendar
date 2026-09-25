@@ -10,6 +10,8 @@ import { MITI } from './data/miti.js';
 
 const $ = (id) => document.getElementById(id);
 
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
 const dateEngine = new DateEngine();
 const eventProvider = new EventProvider();
 
