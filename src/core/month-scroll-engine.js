@@ -187,8 +187,9 @@ export class MonthScrollEngine {
         : '';
 
       const dotColor = hasUserEvent ? 'bg-iosblue-500' : 'bg-iosred-500';
+      const dotPlacement = isToday ? 'top-[9px] bg-black' : `bottom-1 ${dotColor}`;
       const eventDot = hasHoliday || hasUserEvent
-        ? `<div class="absolute bottom-1 w-1 h-1 rounded-full ${isToday ? 'bg-white' : dotColor}"></div>`
+        ? `<div class="absolute w-1 h-1 rounded-full ${dotPlacement}"></div>`
         : '';
 
       html += `
